@@ -661,9 +661,8 @@ main > section {
 
 .synthesis-top-divider {
     position: absolute;
-    top: -1.97px;
+    top: -1.88px;
     left: 0;
-    height: 2.18px;
 }
 
 .pattern {
@@ -1298,8 +1297,7 @@ main > section {
 
 /* The 0.18px-tall Figma divider draws its stroke above its box */
 .reflection-content > .divider {
-    height: 2.18px;
-    margin-top: -2px;
+    margin-top: -1.82px;
 }
 
 .learned {
