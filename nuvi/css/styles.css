@@ -143,9 +143,12 @@ main > section {
 }
 
 /* ---------- Cover ---------- */
+/* Above 1400px the whole cover scales with the window (js/main.js sets --cover-zoom),
+   so the graphics stay flush right and the vine stays attached to the logo */
 .cover {
     position: relative;
     height: 900px;
+    zoom: var(--cover-zoom, 1);
 }
 
 .cover-bg {
@@ -200,41 +203,19 @@ main > section {
     transform: rotate(49.72deg);
 }
 
+/* Figma SVG export of the "Plant" frame, pinned to the right edge */
 .cover-plant {
-    top: -202px;
-    left: 581px;
-    width: 1032.624px;
-    height: 854.988px;
-}
-
-.cover-plant .plant-leaves {
+    position: absolute;
     top: 0;
-    left: 10.74px;
-    width: 989.67px;
-    height: 817.78px;
-}
-
-.cover-plant .plant-leaves img {
-    width: 447.018px;
-    height: 883.656px;
-}
-
-.cover-plant .plant-branch {
-    top: 230px;
-    left: 658px;
-    width: 251.702px;
-    height: 245.351px;
-}
-
-.cover-plant .plant-branch img {
-    width: 149.066px;
-    height: 203.602px;
+    right: 0;
+    width: 819px;
+    height: 653px;
 }
 
 .cover-logo img {
     position: absolute;
     top: 79px;
-    left: 100px;
+    left: var(--cover-margin, 100px);
     width: 575px;
     height: 343px;
 }
@@ -242,7 +223,7 @@ main > section {
 .cover-title {
     position: absolute;
     top: 483px;
-    left: 100px;
+    left: var(--cover-margin, 100px);
     width: 677px;
     font-size: 70px;
     font-weight: 800;
@@ -250,124 +231,15 @@ main > section {
     color: var(--cream);
 }
 
-/* Phone & Shadow (Figma 790:9924): overlaps the nav and hero below the cover */
+/* Phone & Shadow (Figma SVG export, 790:9924): pinned to the right edge, overlapping the nav and hero.
+   The export's last 80px are transparent, so they hang past the edge as in Figma. */
 .cover-phone {
     position: absolute;
-    top: 366.51px;
-    left: 760px;
+    top: 280.6px;
+    right: -80.2px;
     z-index: 20;
-    width: 660.069px;
-    height: 790px;
-}
-
-.cover-phone > div,
-.cover-phone-frame-inner > div {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cover-phone-shadow div {
-    flex-shrink: 0;
-    background-color: rgba(0, 0, 0, 0.25);
-    filter: blur(22.5px);
-}
-
-.cover-phone-shadow--1 {
-    top: 454.66px;
-    left: 34.61px;
-    width: 384.346px;
-    height: 335.258px;
-}
-
-.cover-phone-shadow--1 div {
-    width: 348.668px;
-    height: 291.461px;
-    transform: rotate(7.65deg);
-}
-
-.cover-phone-shadow--2 {
-    top: 370.75px;
-    left: 72.88px;
-    width: 397.306px;
-    height: 378.146px;
-}
-
-.cover-phone-shadow--2 div {
-    width: 320.344px;
-    height: 289.361px;
-    transform: rotate(19.07deg);
-}
-
-.cover-phone-device {
-    top: -27.1px;
-    left: -27.66px;
-    width: 715.06px;
-    height: 843.49px;
-}
-
-.cover-phone-mask {
-    position: relative;
-    flex-shrink: 0;
-    width: 672.74px;
-    height: 810.17px;
-    transform: rotate(-3deg);
-    -webkit-mask-image: url("../images/cover-phone-mask.svg");
-    mask-image: url("../images/cover-phone-mask.svg");
-    mask-mode: luminance;
-    -webkit-mask-size: 710.961px 839.719px;
-    mask-size: 710.961px 839.719px;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-clip: no-clip;
-    mask-clip: no-clip;
-}
-
-.cover-phone-mask img {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-}
-
-.cover-phone-frame {
-    top: -51.98px;
-    left: 65.15px;
-    width: 621.222px;
-    height: 747.146px;
-}
-
-.cover-phone-frame-inner {
-    position: relative;
-    flex-shrink: 0;
-    width: 584.515px;
-    height: 717.576px;
-    overflow: hidden;
-    transform: rotate(-3deg);
-}
-
-.cover-phone-branch {
-    top: -35.6px;
-    left: 335.23px;
-    width: 284.892px;
-    height: 238.761px;
-}
-
-.cover-phone-branch > div {
-    position: relative;
-    flex-shrink: 0;
-    width: 180.33px;
-    height: 246.097px;
-    transform: rotate(-74.74deg);
-}
-
-.cover-phone-branch img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 495.8px;
-    height: 251.348px;
-    max-width: none;
+    width: 745.8px;
+    height: 899.8px;
 }
 
 /* ---------- Nav (Nav Bar component) ---------- */
@@ -390,7 +262,7 @@ main > section {
     align-items: center;
     gap: 40px;
     height: 100%;
-    padding: 0 100px;
+    padding: 0 var(--nav-margin, 100px);
     box-sizing: border-box;
 }
 

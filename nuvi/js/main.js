@@ -7,10 +7,22 @@
 const DESIGN_WIDTH = 1400;
 const caseStudy = document.querySelector(".case-study");
 
-/* ---------- Scale the 1400px design frame on narrower screens ---------- */
+/* ---------- Scale the 1400px design frame to the window ----------
+   Narrower screens scale the whole page down; wider screens scale the cover up.
+   The cover text and nav share a left margin of 100px at 1400px (~7% of the width),
+   never less than 100 real pixels. */
+const MIN_MARGIN = 100;
+
 function updateZoom() {
-    const zoom = Math.min(1, document.documentElement.clientWidth / DESIGN_WIDTH);
-    caseStudy.style.setProperty("--page-zoom", zoom);
+    const ratio = document.documentElement.clientWidth / DESIGN_WIDTH;
+    const pageZoom = Math.min(1, ratio);
+    const coverZoom = Math.max(1, ratio);
+
+    caseStudy.style.setProperty("--page-zoom", pageZoom);
+    caseStudy.style.setProperty("--cover-zoom", coverZoom);
+    // Margins are set in design pixels, so divide out the zoom they are rendered at
+    caseStudy.style.setProperty("--cover-margin", `${MIN_MARGIN / pageZoom}px`);
+    caseStudy.style.setProperty("--nav-margin", `${(MIN_MARGIN * coverZoom) / pageZoom}px`);
 }
 
 updateZoom();
