@@ -143,12 +143,9 @@ main > section {
 }
 
 /* ---------- Cover ---------- */
-/* Above 1400px the whole cover scales with the window (js/main.js sets --cover-zoom),
-   so the graphics stay flush right and the vine stays attached to the logo */
 .cover {
     position: relative;
     height: 900px;
-    zoom: var(--cover-zoom, 1);
 }
 
 .cover-bg {
@@ -166,11 +163,17 @@ main > section {
     object-fit: cover;
 }
 
-.cover .frame {
+/* Full-width stage: the text shares the page content column, the graphics pin to the right edge */
+.cover-stage {
+    position: relative;
     height: 900px;
 }
 
-/* The Cover frame clips its plant at the 1400px frame edge; the phone is outside that clip */
+.cover-text {
+    height: 100%;
+}
+
+/* Clips the plant at the top and right edges; the phone sits outside this clip */
 .cover-clip {
     position: absolute;
     inset: 0;
@@ -215,7 +218,7 @@ main > section {
 .cover-logo img {
     position: absolute;
     top: 79px;
-    left: var(--cover-margin, 100px);
+    left: 0;
     width: 575px;
     height: 343px;
 }
@@ -223,7 +226,7 @@ main > section {
 .cover-title {
     position: absolute;
     top: 483px;
-    left: var(--cover-margin, 100px);
+    left: 0;
     width: 677px;
     font-size: 70px;
     font-weight: 800;
@@ -262,8 +265,6 @@ main > section {
     align-items: center;
     gap: 40px;
     height: 100%;
-    padding: 0 var(--nav-margin, 100px);
-    box-sizing: border-box;
 }
 
 .nav-tab {
@@ -1355,9 +1356,9 @@ main > section {
     }
 }
 
-/* ---------- Narrower screens ----------
-   The Figma frame is a single 1400px desktop layout. Below that width
-   js/main.js sets --page-zoom so the whole frame scales down proportionally. */
+/* ---------- Fit to the window ----------
+   The Figma frame is a single 1400px desktop layout. js/main.js sets --page-zoom
+   so the shared 1200px content column always sits between equal side margins. */
 .case-study {
     zoom: var(--page-zoom, 1);
 }

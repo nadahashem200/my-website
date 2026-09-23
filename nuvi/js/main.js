@@ -7,22 +7,28 @@
 const DESIGN_WIDTH = 1400;
 const caseStudy = document.querySelector(".case-study");
 
-/* ---------- Scale the 1400px design frame to the window ----------
-   Narrower screens scale the whole page down; wider screens scale the cover up.
-   The cover text and nav share a left margin of 100px at 1400px (~7% of the width),
-   never less than 100 real pixels. */
-const MIN_MARGIN = 100;
+/* ---------- Fit the design to the window ----------
+   Every section (cover text and nav included) sits in the same 1200px content
+   column. The side margin is chosen first, then the page is zoomed so that
+   column fills exactly the space between the margins:
+   - 1400px and wider: margins are 1/14 of the width (100px at 1400px, as in Figma)
+   - 700-1400px: margins stay at 100px
+   - under 700px: margins are 1/7 of the width
+   Past MAX_ZOOM the column stops growing and the margins widen instead. */
+const CONTENT_WIDTH = 1200;
+const MAX_ZOOM = 1.6;
+
+function sideMargin(width) {
+    if (width >= DESIGN_WIDTH) {
+        return width / 14;
+    }
+    return width >= 700 ? 100 : width / 7;
+}
 
 function updateZoom() {
-    const ratio = document.documentElement.clientWidth / DESIGN_WIDTH;
-    const pageZoom = Math.min(1, ratio);
-    const coverZoom = Math.max(1, ratio);
-
-    caseStudy.style.setProperty("--page-zoom", pageZoom);
-    caseStudy.style.setProperty("--cover-zoom", coverZoom);
-    // Margins are set in design pixels, so divide out the zoom they are rendered at
-    caseStudy.style.setProperty("--cover-margin", `${MIN_MARGIN / pageZoom}px`);
-    caseStudy.style.setProperty("--nav-margin", `${(MIN_MARGIN * coverZoom) / pageZoom}px`);
+    const width = document.documentElement.clientWidth;
+    const zoom = Math.min(MAX_ZOOM, (width - 2 * sideMargin(width)) / CONTENT_WIDTH);
+    caseStudy.style.setProperty("--page-zoom", zoom);
 }
 
 updateZoom();
