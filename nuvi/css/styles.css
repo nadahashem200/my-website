@@ -1398,6 +1398,19 @@ main > section {
         text-wrap: pretty;
     }
 
+    /* Plain browser wrapping everywhere: this overrides every balance/pretty
+       rule above and the widow-fix .keep-word spans. Only the wrapping style is
+       reset (text-wrap-style, not the text-wrap shorthand), so elements that
+       never wrapped before (the nav tabs, .nowrap) still stay on one line. */
+    .case-study,
+    .case-study * {
+        text-wrap-style: auto !important;
+    }
+
+    .case-study .keep-word {
+        white-space: normal !important;
+    }
+
     .frame,
     .container {
         width: auto;
