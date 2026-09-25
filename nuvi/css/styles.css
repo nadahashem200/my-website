@@ -1383,6 +1383,22 @@ main > section {
         --nav-height: 60px;
     }
 
+    /* No widows (a lone word on the last line). Headings and short labels are
+       balanced across their lines; paragraphs re-wrap their last lines. */
+    .case-study :is(h1, h2, h3, h4, dt, figcaption, .team-name, .team-role,
+        .stat-label, .theme-subtitle, .hmw-reframe-lead, .hmw-reframe-question,
+        .hero-hmw-question, .next-steps-point, .learned-lead, .wrap-up-line,
+        .wrap-up-thanks, .slide-desc) {
+        text-wrap: balance;
+    }
+
+    .case-study :is(p, li, dd):not(.team-name, .team-role, .stat-label,
+        .theme-subtitle, .hmw-reframe-lead, .hmw-reframe-question,
+        .hero-hmw-question, .next-steps-point, .learned-lead, .wrap-up-line,
+        .wrap-up-thanks, .slide-desc) {
+        text-wrap: pretty;
+    }
+
     .frame,
     .container {
         width: auto;
@@ -1652,7 +1668,7 @@ main > section {
         position: static;
         height: auto;
         margin-top: 14px;
-        font-size: 17px;
+        font-size: clamp(14px, 3.9vw, 17px); /* shrinks so full names fit on one line */
         line-height: 1.3;
         white-space: normal;
     }
@@ -1754,7 +1770,8 @@ main > section {
     }
 
     .stat-number {
-        width: 80px !important; /* inline widths in index.html */
+        width: auto !important; /* sized to the number (overrides inline widths), so every
+                                  number-to-label gap is the same 16px */
         font-size: 34px;
         line-height: 1.1;
     }
@@ -1764,6 +1781,17 @@ main > section {
         font-size: 16px;
         line-height: 1.4;
         white-space: normal;
+    }
+
+    /* The desktop line breaks are dropped so the label can balance its own lines */
+    .stat-label br {
+        display: none;
+    }
+
+    /* Paragraph-final hyphenated words stay together so their last half is
+       never left alone on a line */
+    .keep-word {
+        white-space: nowrap;
     }
 
     /* Synthesis */
@@ -1797,6 +1825,12 @@ main > section {
         width: 5px;
         height: 100%;
         margin: 0;
+    }
+
+    /* Trim the text block to the top of its first line's capitals and the
+       baseline of its last line, so the line spans exactly the visible text */
+    .lined-text-body {
+        text-box: trim-both cap alphabetic;
     }
 
     .pattern-text .lined-text-body,
@@ -1886,7 +1920,11 @@ main > section {
     }
 
     .theme-number img {
-        width: 72px;
+        /* Exactly as wide as the number above it, as in Figma: width 0 keeps the
+           image from widening its container, min-width then stretches it */
+        width: 0;
+        min-width: 100%;
+        height: 5px;
         margin-top: 8px;
     }
 
@@ -2086,7 +2124,7 @@ main > section {
     }
 
     .tradeoffs .title-block + .tradeoff {
-        margin-top: var(--space);
+        margin-top: 28px; /* same title-to-content gap as Project Details and Synthesis */
     }
 
     .tradeoff,
