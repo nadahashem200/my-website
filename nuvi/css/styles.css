@@ -738,10 +738,11 @@ main > section {
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+/* Spans the full width of the figure (the image's width) and starts at the
+   image's left edge */
 .affinity .caption {
-    width: 423px;
     height: 26px;
-    text-align: center;
+    text-align: left;
 }
 
 .pattern-divider {
