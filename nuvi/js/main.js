@@ -25,10 +25,21 @@ function sideMargin(width) {
     return width >= 700 ? 100 : width / 7;
 }
 
+/* The cover + nav must fit the viewport height. In design pixels, the lowest
+   thing that has to stay visible is the bottom of the phone (it hangs below
+   the nav), 1085px down. --fit shrinks the cover and nav sizes to fit; the
+   text and graphics keep their left-margin and right-edge anchors. */
+const COVER_FIT_HEIGHT = 1085;
+
 function updateZoom() {
     const width = document.documentElement.clientWidth;
     const zoom = Math.min(MAX_ZOOM, (width - 2 * sideMargin(width)) / CONTENT_WIDTH);
     caseStudy.style.setProperty("--page-zoom", zoom);
+
+    // clientHeight is the stable viewport height (it ignores mobile toolbar show/hide)
+    const height = document.documentElement.clientHeight;
+    const fit = Math.min(1, height / (COVER_FIT_HEIGHT * zoom));
+    caseStudy.style.setProperty("--fit", fit);
 }
 
 updateZoom();
