@@ -1388,12 +1388,12 @@ main > section {
        (which balancing splits into uneven halves), re-wrap only their last lines. */
     .case-study :is(h1, h2, h3, h4, dt, figcaption, .team-name, .team-role,
         .stat-label, .theme-subtitle, .hmw-reframe-question,
-        .hero-hmw-question, .slide-desc):not(.tradeoff-shift) {
+        .hero-hmw-question):not(.tradeoff-shift) {
         text-wrap: balance;
     }
 
     .case-study :is(p, li, dd):not(.team-name, .team-role, .stat-label,
-        .theme-subtitle, .hmw-reframe-question, .hero-hmw-question, .slide-desc),
+        .theme-subtitle, .hmw-reframe-question, .hero-hmw-question),
     .case-study .tradeoff-shift {
         text-wrap: pretty;
     }
@@ -1974,7 +1974,7 @@ main > section {
         display: flex;
         flex-direction: column;
         height: auto;
-        padding: var(--space) var(--m);
+        padding: 40px var(--m); /* tighter than --space, so the band doesn't read as a gap */
     }
 
     .hmw-reframe-text {
@@ -2082,14 +2082,33 @@ main > section {
         gap: 24px;
     }
 
+    /* Every description takes at least 4 lines, so the progress bar and the
+       screen below it stay in the same place from slide to slide */
     .slide-desc {
         width: auto;
+        min-height: 5.8em; /* 4 lines */
         font-size: 17px;
         line-height: 1.45;
     }
 
     .slide-body img {
         width: 100%;
+    }
+
+    /* Some progress SVGs have empty space above or below their 13px track;
+       the margins trim each one to the track so every bar sits in the same place */
+    .slide[data-step="1"] .slide-body img {
+        margin-top: -15px;
+    }
+
+    .slide:is([data-step="3"], [data-step="4"]) .slide-body img {
+        margin-top: -1px;
+        margin-bottom: -14px;
+    }
+
+    .slide[data-step="5"] .slide-body img {
+        margin-top: -0.5px;
+        margin-bottom: -15.5px;
     }
 
     .slide-step {
