@@ -31,8 +31,19 @@ function sideMargin(width) {
    text and graphics keep their left-margin and right-edge anchors. */
 const COVER_FIT_HEIGHT = 1085;
 
+/* Below this width the page uses its own stacked mobile layout (see the
+   "Mobile layout" section of styles.css) instead of the scaled desktop frame. */
+const MOBILE_MAX_WIDTH = 767;
+
 function updateZoom() {
     const width = document.documentElement.clientWidth;
+
+    if (width <= MOBILE_MAX_WIDTH) {
+        caseStudy.style.setProperty("--page-zoom", 1);
+        caseStudy.style.setProperty("--fit", 1);
+        return;
+    }
+
     const zoom = Math.min(MAX_ZOOM, (width - 2 * sideMargin(width)) / CONTENT_WIDTH);
     caseStudy.style.setProperty("--page-zoom", zoom);
 

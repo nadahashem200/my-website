@@ -22,6 +22,9 @@
 
 html {
     scroll-behavior: smooth;
+    /* Stop phone browsers from auto-enlarging text (it overflows fixed-size boxes) */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -117,6 +120,10 @@ main > section {
 
 .w-800 {
     width: 800px;
+}
+
+.nowrap {
+    white-space: nowrap;
 }
 
 .caption {
@@ -1362,4 +1369,899 @@ main > section {
    so the shared 1200px content column always sits between equal side margins. */
 .case-study {
     zoom: var(--page-zoom, 1);
+}
+
+/* ---------- Mobile layout (767px and narrower) ----------
+   js/main.js turns the page zoom off at these widths. Instead of shrinking the
+   1400px desktop frame, every section stacks vertically, fixed Figma widths and
+   heights are released so text can reflow, and type is set at phone sizes.
+   A few !important rules override inline styles in index.html. */
+@media (max-width: 767px) {
+    .case-study {
+        --m: 24px;
+        --space: 64px; /* the one spacing value between sections and major blocks */
+        --nav-height: 60px;
+    }
+
+    .frame,
+    .container {
+        width: auto;
+    }
+
+    .container {
+        margin: 0 var(--m);
+    }
+
+    /* Shared text */
+    .section-title,
+    .section-title--45,
+    .details-text .section-title {
+        height: auto;
+        font-size: 22px;
+        line-height: 1.2;
+        white-space: normal;
+    }
+
+    .title-block .underline,
+    .title-block .underline--thick,
+    .pattern .underline,
+    .tradeoffs .underline--thick {
+        margin-top: 12px;
+        max-width: 100%;
+    }
+
+    .body-text,
+    .body-text--36,
+    .lined-text-body {
+        font-size: 17px;
+        line-height: 1.55;
+    }
+
+    .w-800 {
+        width: auto;
+    }
+
+    .caption,
+    .caption--18 {
+        width: auto !important; /* inline widths in index.html */
+        height: auto;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* Every caption is left-aligned on mobile */
+    .caption--center {
+        text-align: left;
+    }
+
+    .divider {
+        width: 100%;
+    }
+
+    /* Cover: the logo and leaf branch keep their desktop arrangement (the vine
+       starts under the "i"), scaled to span from the 24px margin to the right
+       edge. On desktop that span is 1300 Figma px (logo left 100 to edge 1400),
+       so --k is one Figma px. The headline follows below; no phone. */
+    .cover,
+    .cover-stage {
+        height: auto;
+    }
+
+    .cover {
+        --k: calc((100vw - var(--m)) / 1300);
+    }
+
+    .cover-stage {
+        display: flex;
+        flex-direction: column;
+        padding: calc(79 * var(--k)) 0 var(--space);
+    }
+
+    .cover-plant {
+        width: calc(819 * var(--k));
+        height: auto;
+    }
+
+    .cover-text {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: max(16px, calc(61 * var(--k)));
+        height: auto;
+    }
+
+    .cover-logo img,
+    .cover-title {
+        position: static;
+    }
+
+    .cover-logo img {
+        width: calc(575 * var(--k));
+        height: auto;
+    }
+
+    .cover-title {
+        width: auto;
+        font-size: min(6.6vw, 27px);
+        line-height: 1.3;
+    }
+
+    /* No phone on mobile (its small leaf branch is part of the same artwork) */
+    .cover-phone {
+        display: none;
+    }
+
+    /* Nav: all five tabs on one line with at least 16px between them. The font
+       fills the remaining width, from 12px up to 15px (the five labels are
+       21.54em wide in total), and the tabs spread out to at most 28px apart.
+       Below about 360px the tabs scroll sideways rather than shrink further. */
+    .case-nav-inner {
+        justify-content: space-between;
+        gap: 16px;
+        max-width: calc(21.54 * 15px + 4 * 28px);
+        margin: 0;
+        padding: 0 var(--m);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .case-nav-inner::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-tab {
+        font-size: clamp(12px, calc((100vw - 2 * 24px - 4 * 16px) / 21.54), 15px);
+        line-height: 1.6;
+    }
+
+    /* Hero */
+    .hero .container {
+        padding: var(--space) 0;
+    }
+
+    .hero-title {
+        width: auto;
+        height: auto;
+        font-size: 21px;
+        line-height: 1.25;
+    }
+
+    .hero-title br {
+        display: none;
+    }
+
+    .hero-headline .underline {
+        margin-top: 16px;
+        max-width: 100%;
+    }
+
+    .hero-hmw {
+        margin-top: 32px;
+        gap: 8px;
+    }
+
+    .hero-hmw-lead {
+        font-size: 15px;
+    }
+
+    .hero-hmw-question {
+        width: auto;
+        font-size: 18px;
+        line-height: 1.35;
+    }
+
+    .what-is-nuvi {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space);
+        height: auto;
+        margin-top: calc(1.5 * var(--space)); /* extra room before the NUVI introduction */
+    }
+
+    .what-is-nuvi-text {
+        gap: 12px;
+        width: auto;
+    }
+
+    .nuvi-name {
+        height: auto;
+        font-size: 26px;
+    }
+
+    .what-is-nuvi-text .body-text {
+        width: auto;
+        padding-top: 0;
+    }
+
+    .hero-mockup {
+        align-self: center;
+        width: 200px;
+        height: auto;
+    }
+
+    /* Project details: text first, then the illustration */
+    .project-details .container {
+        padding: var(--space) 0;
+    }
+
+    .details-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        gap: var(--space);
+    }
+
+    .details-illustration {
+        width: 100%;
+        height: auto;
+    }
+
+    .details-text {
+        gap: 28px;
+        width: auto;
+    }
+
+    .details-list dt {
+        height: auto;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .details-list dd {
+        font-size: 18px;
+        line-height: 1.5;
+    }
+
+    .details-list div {
+        gap: 4px;
+    }
+
+    .details-list .details-contribution {
+        height: auto;
+    }
+
+    /* Team: two cards per row */
+    .team {
+        gap: 28px;
+        margin-top: var(--space);
+    }
+
+    .team-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .team-card {
+        width: auto;
+        height: auto;
+        padding: 20px 8px;
+    }
+
+    .team-pic,
+    .team-card--nada .team-pic,
+    .team-card--cherilin .team-pic {
+        width: auto;
+        height: 88px;
+        margin: 0;
+    }
+
+    .team-name,
+    .team-card--harsimran .team-name {
+        position: static;
+        height: auto;
+        margin-top: 14px;
+        font-size: 17px;
+        line-height: 1.3;
+        white-space: normal;
+    }
+
+    .team-role,
+    .team-card--harsimran .team-role {
+        height: auto;
+        font-size: 14px;
+        line-height: 1.35;
+    }
+
+    .team-qr,
+    .team-card--harsimran .team-qr {
+        width: 64px;
+        height: 64px;
+        margin-top: 14px;
+    }
+
+    .team-linkedin {
+        height: auto;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .team-thanks {
+        height: auto;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    /* Discovery: step numbers move beside each step title */
+    .discovery .container {
+        padding: var(--space) 0;
+    }
+
+    .discovery-intro {
+        gap: 24px;
+    }
+
+    .discovery-intro .body-text {
+        height: auto;
+    }
+
+    .discovery-steps {
+        margin-top: var(--space);
+    }
+
+    .step-numbers,
+    .step-divider {
+        display: none;
+    }
+
+    .steps {
+        gap: var(--space);
+        padding-top: 0;
+        counter-reset: step;
+    }
+
+    .step {
+        gap: 12px;
+        counter-increment: step;
+    }
+
+    .step-heading {
+        height: auto;
+    }
+
+    .step-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 17px;
+        line-height: 1.3;
+        white-space: normal;
+    }
+
+    .step-title::before {
+        content: counter(step);
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: var(--gold-emphasis);
+        color: var(--background-color);
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 16px !important; /* inline gaps in index.html */
+        margin-top: 8px;
+    }
+
+    .stat {
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-number {
+        width: 80px !important; /* inline widths in index.html */
+        font-size: 34px;
+        line-height: 1.1;
+    }
+
+    .stat-label {
+        padding-top: 0;
+        font-size: 16px;
+        line-height: 1.4;
+        white-space: normal;
+    }
+
+    /* Synthesis */
+    .synthesis .container {
+        padding-top: var(--space);
+    }
+
+    .pattern {
+        gap: 28px;
+        padding-bottom: var(--space);
+    }
+
+    .pattern-row {
+        flex-direction: column;
+        gap: var(--space);
+    }
+
+    .lined-text {
+        position: relative;
+        display: block;
+        width: auto !important; /* inline heights/widths in index.html */
+        height: auto !important;
+        padding-left: 21px;
+    }
+
+    /* The line SVG stretches (preserveAspectRatio="none") to the paragraph's height */
+    .lined-text-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        margin: 0;
+    }
+
+    .pattern-text .lined-text-body,
+    .tradeoff-text .lined-text-body {
+        width: auto;
+        height: auto;
+    }
+
+    .lined-text-body p + p {
+        margin-top: 1em;
+    }
+
+    .affinity {
+        width: auto;
+    }
+
+    .affinity-map {
+        width: 100%;
+        height: auto;
+    }
+
+    .affinity .caption {
+        text-align: left;
+    }
+
+    .pattern-divider {
+        position: static;
+        margin-bottom: var(--space);
+    }
+
+    .themes {
+        gap: var(--space);
+        padding-bottom: var(--space);
+    }
+
+    .themes-intro {
+        gap: 16px;
+    }
+
+    .themes-title {
+        height: auto;
+        font-size: 19px;
+        line-height: 1.25;
+    }
+
+    .themes-text {
+        width: auto;
+        height: auto;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    .card-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .card {
+        padding: 20px 20px 24px;
+    }
+
+    .card-title {
+        width: auto;
+        height: auto;
+        font-size: 18px;
+        line-height: 1.3;
+    }
+
+    .card-title br {
+        display: none;
+    }
+
+    .theme-card {
+        gap: 16px;
+        min-height: 0;
+    }
+
+    .theme-stat {
+        gap: 12px;
+        width: auto;
+        margin-bottom: 0;
+    }
+
+    .theme-number p {
+        font-size: 32px;
+        line-height: 1.1;
+    }
+
+    .theme-number img {
+        width: 72px;
+        margin-top: 8px;
+    }
+
+    .theme-women {
+        height: auto;
+        padding-bottom: 14px;
+        font-size: 16px;
+        line-height: 1.3;
+    }
+
+    .theme-subtitle {
+        font-size: 17px;
+        line-height: 1.35;
+    }
+
+    .theme-quote {
+        width: auto !important; /* inline width in index.html */
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .themes-summary {
+        height: auto;
+        font-size: 18px;
+        line-height: 1.35;
+    }
+
+    .hmw-reframe {
+        height: auto;
+    }
+
+    .hmw-reframe-inner {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        padding: var(--space) var(--m);
+    }
+
+    .hmw-reframe-text {
+        gap: 12px;
+        width: auto;
+    }
+
+    .hmw-reframe-lead {
+        font-size: 16px;
+    }
+
+    .hmw-reframe-question {
+        font-size: 19px;
+        line-height: 1.3;
+    }
+
+    /* The watering-can illustration sits inside the band's bottom padding, in
+       the bottom-right corner. It is positioned absolutely so the band keeps its
+       text-only height, and it is 6px shorter than the padding so it can never
+       reach the question text, however that text wraps. */
+    .hmw-reframe-inner {
+        position: relative;
+    }
+
+    .hmw-illustration {
+        position: absolute;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: auto;
+        width: auto;
+        height: calc(var(--space) - 6px);
+    }
+
+    /* Design */
+    .design .container {
+        padding: var(--space) 0;
+    }
+
+    .design-intro {
+        gap: 16px;
+    }
+
+    .design-text {
+        height: auto;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    .insight-grid {
+        grid-template-rows: none;
+        height: auto;
+        margin-top: var(--space);
+    }
+
+    .insight-card {
+        gap: 16px;
+    }
+
+    .decision {
+        gap: 6px;
+        width: auto;
+    }
+
+    .decision-label {
+        height: auto;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .decision-text {
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    /* Final UI carousel: the step text on top, then the screen with an arrow
+       on each side (three-column row: arrow | screen | arrow) */
+    .final-ui-frame {
+        height: auto;
+    }
+
+    .slide {
+        position: relative;
+        inset: auto;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr) 40px;
+        align-items: center;
+        gap: 28px 12px;
+        padding: var(--space) var(--m);
+    }
+
+    /* display: grid above would otherwise override the hidden attribute */
+    .slide[hidden] {
+        display: none;
+    }
+
+    /* While sliding in, the new step overlays the old one */
+    .slide.is-entering {
+        position: absolute;
+        inset: 0 0 auto;
+    }
+
+    .slide-text {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        position: static;
+        gap: 12px;
+        width: auto;
+        transform: none;
+    }
+
+    .slide-title {
+        font-size: 21px;
+        line-height: 1.2;
+    }
+
+    .slide-body {
+        gap: 24px;
+    }
+
+    .slide-desc {
+        width: auto;
+        font-size: 17px;
+        line-height: 1.45;
+    }
+
+    .slide-body img {
+        width: 100%;
+    }
+
+    .slide-step {
+        height: auto;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .slide-screen {
+        grid-column: 2;
+        grid-row: 2;
+        position: static;
+        justify-self: center;
+        width: min(100%, 240px);
+        height: auto;
+    }
+
+    .arrow {
+        position: relative;
+        top: auto;
+        left: auto;
+        grid-row: 2;
+        width: 40px;
+        height: 40px;
+    }
+
+    .arrow--prev {
+        grid-column: 1;
+    }
+
+    .arrow--next {
+        grid-column: 3;
+    }
+
+    /* The arrow artwork is 60.5px for a 58.5px button; scale it to the 40px button */
+    .arrow img {
+        top: -0.68px;
+        left: -0.68px;
+        width: 41.37px;
+        height: 41.37px;
+    }
+
+    /* Trade-offs: text first, then its image */
+    .tradeoffs .container {
+        padding: var(--space) 0;
+    }
+
+    .tradeoffs .title-block + .tradeoff {
+        margin-top: var(--space);
+    }
+
+    .tradeoff,
+    .tradeoff--quest {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space);
+    }
+
+    .tradeoff-divider {
+        margin: var(--space) 0;
+    }
+
+    .tradeoff-text {
+        width: auto;
+    }
+
+    .tradeoff-initial {
+        height: auto;
+    }
+
+    .tradeoff-title {
+        height: auto;
+        margin-bottom: 12px;
+        font-size: 18px;
+        line-height: 1.3;
+    }
+
+    .tradeoff-shift {
+        margin-top: 28px;
+        margin-bottom: 8px;
+        font-size: 17px;
+        line-height: 1.35;
+    }
+
+    .tradeoff-figure {
+        order: 2;
+        width: auto;
+    }
+
+    .tradeoff-figure .shadow-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .prototype-shots {
+        width: 100%;
+        height: auto;
+        gap: 8px;
+    }
+
+    .prototype-shot--1,
+    .prototype-shot--2 {
+        flex: 1 1 0;
+        width: auto;
+        height: auto;
+        min-width: 0;
+    }
+
+    .prototype-shot--1 {
+        aspect-ratio: 285 / 525;
+    }
+
+    .prototype-shot--2 {
+        aspect-ratio: 289.4 / 524.5;
+    }
+
+    /* Reflection: the large rotated plant is left out so it can't cover the text */
+    .reflection {
+        height: auto;
+    }
+
+    .reflection-bg {
+        inset: 0;
+        height: auto;
+    }
+
+    .reflection-frame {
+        height: auto;
+    }
+
+    .reflection-plant {
+        display: none;
+    }
+
+    .reflection-content {
+        gap: var(--space);
+        padding: var(--space) 0 calc(2 * var(--space)); /* the page ends here, so twice the usual space */
+    }
+
+    .next-steps {
+        gap: 16px;
+    }
+
+    .next-steps-text {
+        width: auto;
+        height: auto;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    .next-steps-text ul {
+        margin-top: 16px;
+        padding-left: 22px;
+    }
+
+    .next-steps-text li + li {
+        margin-top: 16px;
+    }
+
+    .next-steps-text li::marker {
+        font-size: 17px;
+    }
+
+    .next-steps-point {
+        font-size: 17px;
+        line-height: 1.35;
+    }
+
+    .learned {
+        gap: 16px;
+        width: auto;
+        margin-left: 0;
+    }
+
+    .learned-text {
+        height: auto;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    .learned-lead {
+        margin-bottom: 12px;
+        font-size: 17px;
+        line-height: 1.35;
+    }
+
+    .wrap-up {
+        gap: 12px;
+        padding-left: 0;
+    }
+
+    .wrap-up-line {
+        height: auto;
+        font-size: 17px;
+        line-height: 1.4;
+    }
+
+    .wrap-up-thanks {
+        height: auto;
+        padding-left: 0;
+        font-size: 16px;
+    }
+}
+
+/* Very narrow phones: the nav keeps the 24px page margin and tightens the gaps
+   between tabs to 12px so all five still fit */
+@media (max-width: 374px) {
+    .case-nav-inner {
+        gap: 12px;
+    }
+
+    .nav-tab {
+        font-size: clamp(12px, calc((100vw - 2 * 24px - 4 * 12px) / 21.54), 15px);
+    }
 }
