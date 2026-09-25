@@ -56,6 +56,41 @@ function updateZoom() {
 updateZoom();
 window.addEventListener("resize", updateZoom);
 
+/* ---------- Hero underline: sized from the headline's longest line ----------
+   On mobile the headline wraps, and a wrapped block is as wide as the column,
+   not its longest line. This measures the longest line; styles.css sets the
+   underline to 40% of it. */
+const heroTitle = document.querySelector(".hero-title");
+
+function updateHeroLineWidth() {
+    const range = document.createRange();
+    range.selectNodeContents(heroTitle);
+
+    // A line can be split into several rects (the hidden <br>s split the text),
+    // so rects are grouped into lines by their top edge
+    const lines = new Map();
+    for (const rect of range.getClientRects()) {
+        if (rect.width === 0) {
+            continue;
+        }
+        const top = Math.round(rect.top);
+        const line = lines.get(top) ?? { left: rect.left, right: rect.right };
+        line.left = Math.min(line.left, rect.left);
+        line.right = Math.max(line.right, rect.right);
+        lines.set(top, line);
+    }
+
+    let longest = 0;
+    for (const line of lines.values()) {
+        longest = Math.max(longest, line.right - line.left);
+    }
+    heroTitle.parentElement.style.setProperty("--hero-line-width", `${longest}px`);
+}
+
+updateHeroLineWidth();
+window.addEventListener("resize", updateHeroLineWidth);
+document.fonts.ready.then(updateHeroLineWidth);
+
 /* ---------- Nav: click scrolls to a section and selects its tab ---------- */
 const nav = document.querySelector(".case-nav");
 const tabs = [...nav.querySelectorAll(".nav-tab")];

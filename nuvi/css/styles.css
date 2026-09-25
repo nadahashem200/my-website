@@ -1378,24 +1378,23 @@ main > section {
    A few !important rules override inline styles in index.html. */
 @media (max-width: 767px) {
     .case-study {
-        --m: 32px; /* side margin for every section */
+        --m: 24px; /* side margin for every section */
         --space: 64px; /* the one spacing value between sections and major blocks */
         --nav-height: 60px;
     }
 
     /* No widows (a lone word on the last line). Headings and short labels are
-       balanced across their lines; paragraphs re-wrap their last lines. */
+       balanced across their lines; paragraphs, and the short bold lead lines
+       (which balancing splits into uneven halves), re-wrap only their last lines. */
     .case-study :is(h1, h2, h3, h4, dt, figcaption, .team-name, .team-role,
-        .stat-label, .theme-subtitle, .hmw-reframe-lead, .hmw-reframe-question,
-        .hero-hmw-question, .next-steps-point, .learned-lead, .wrap-up-line,
-        .wrap-up-thanks, .slide-desc) {
+        .stat-label, .theme-subtitle, .hmw-reframe-question,
+        .hero-hmw-question, .slide-desc):not(.tradeoff-shift) {
         text-wrap: balance;
     }
 
     .case-study :is(p, li, dd):not(.team-name, .team-role, .stat-label,
-        .theme-subtitle, .hmw-reframe-lead, .hmw-reframe-question,
-        .hero-hmw-question, .next-steps-point, .learned-lead, .wrap-up-line,
-        .wrap-up-thanks, .slide-desc) {
+        .theme-subtitle, .hmw-reframe-question, .hero-hmw-question, .slide-desc),
+    .case-study .tradeoff-shift {
         text-wrap: pretty;
     }
 
@@ -1418,12 +1417,21 @@ main > section {
         white-space: normal;
     }
 
+    /* The block is as wide as its title, and the underline is 60% of that, so it
+       scales with the title's font size: width 0 keeps the underline from
+       widening the block, min-width then sets its length */
+    .title-block {
+        width: fit-content;
+        max-width: 100%;
+    }
+
     .title-block .underline,
     .title-block .underline--thick,
     .pattern .underline,
     .tradeoffs .underline--thick {
+        width: 0;
+        min-width: 60%;
         margin-top: 12px;
-        max-width: 100%;
     }
 
     .body-text,
@@ -1548,9 +1556,11 @@ main > section {
         display: none;
     }
 
+    /* The underline is 40% of the headline's longest line, measured in
+       js/main.js (40% of the column until then) */
     .hero-headline .underline {
+        width: calc(var(--hero-line-width, 100%) * 0.4);
         margin-top: 16px;
-        max-width: 100%;
     }
 
     .hero-hmw {
@@ -1758,20 +1768,24 @@ main > section {
         color: var(--background-color);
     }
 
+    /* Each pair sits side by side, as on desktop, with the number above its
+       label. Both rows use the same split, so they share left edges; the left
+       column is wider for its longer labels (and never narrower than
+       "romantic relationship") */
     .stats {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: minmax(min-content, 14fr) 11fr;
         gap: 16px !important; /* inline gaps in index.html */
         margin-top: 8px;
     }
 
     .stat {
-        align-items: center;
-        gap: 16px;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .stat-number {
-        width: auto !important; /* sized to the number (overrides inline widths), so every
-                                  number-to-label gap is the same 16px */
+        width: auto !important; /* inline widths in index.html */
         font-size: 34px;
         line-height: 1.1;
     }
@@ -1788,8 +1802,8 @@ main > section {
         display: none;
     }
 
-    /* Paragraph-final hyphenated words stay together so their last half is
-       never left alone on a line */
+    /* The last two words of card text and a few paragraphs stay together, so no
+       word is left alone on the last line even where text-wrap isn't supported */
     .keep-word {
         white-space: nowrap;
     }
@@ -2124,7 +2138,7 @@ main > section {
     }
 
     .tradeoffs .title-block + .tradeoff {
-        margin-top: 28px; /* same title-to-content gap as Project Details and Synthesis */
+        margin-top: 40px; /* a little more room than the 28px after other section titles */
     }
 
     .tradeoff,
