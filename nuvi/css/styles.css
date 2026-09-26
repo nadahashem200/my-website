@@ -164,6 +164,8 @@ main > section {
    top and the logo + headline pushed to the bottom. Below 1024px: no height
    rule, just the content plus its padding. */
 .cover {
+    /* The logo width: it sets the width of the logo + headline unit */
+    --logo-w: clamp(360px, 38vw, 620px);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -206,21 +208,32 @@ main > section {
     padding: clamp(56px, 10vw, 160px) 0 clamp(48px, 6vw, 96px);
 }
 
+/* The logo and the headline are one unit, exactly as wide as the logo
+   (--logo-w). The headline is sized in container units of this box, so its
+   first line, "Bringing Addiction's", is always exactly as wide as the logo. */
+.cover-title {
+    container-type: inline-size;
+    width: var(--logo-w);
+}
+
 /* The logo image starts 56/575 of its width above the "i" dot; the negative
-   margin removes that, so the space above is measured to the dot */
+   margin (a % of the unit's width, i.e. the logo's) removes that, so the
+   space above is measured to the dot */
 .cover-logo {
-    margin-top: calc(clamp(170px, 38vw, 620px) * -56 / 575);
+    margin-top: calc(-100% * 56 / 575);
 }
 
 .cover-logo img {
-    width: clamp(170px, 38vw, 620px);
+    width: 100%;
     height: auto;
 }
 
-/* Always the three lines of the <br>s; trimmed to its last baseline */
-.cover-title {
-    margin-top: clamp(20px, 2.5vw, 40px);
-    font-size: clamp(26px, 4vw, 64px);
+/* Calibrated so "Bringing Addiction's" is 100% of the unit's width. Each of
+   the three lines (the <br>s) stays on one line; trimmed to its last
+   baseline. 6cqi = 0.06 x the logo width. */
+.cover-headline {
+    margin-top: 6cqi;
+    font-size: calc(10.376 * 1cqi);
     font-weight: 800;
     line-height: 1.2;
     color: var(--cream);
@@ -1318,15 +1331,22 @@ main > section {
 /* ---------- Reflection ---------- */
 .reflection {
     position: relative;
-    height: 1294px;
     overflow: hidden;
 }
 
 .reflection-bg {
     position: absolute;
-    inset: 0 0 auto;
-    height: 1325px;
+    inset: 0;
     overflow: hidden;
+}
+
+/* A 15% layer of the texture's darkest green (#0b311e) over it, so it's more
+   even behind the text; the texture still shows through */
+.reflection-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(11, 49, 30, 0.15);
 }
 
 .reflection-texture {
@@ -1339,16 +1359,17 @@ main > section {
 }
 
 .reflection-frame {
-    height: 100%;
+    position: relative;
     overflow: hidden;
 }
 
-/* Same plant as the cover, rotated 95.23deg and clipped by the Reflection frame */
+/* Same plant as the cover, rotated 95.23deg and clipped by the Reflection frame.
+   Hidden: in the two-column layout it would sit behind the Next Steps text. */
 .reflection-plant {
     position: absolute;
     top: 643px;
     left: -248px;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     width: 830.154px;
@@ -1387,90 +1408,184 @@ main > section {
     height: 178.766px;
 }
 
+/* Next Steps, then What I Learned, stacked in one column; then the
+   closing, full width and centred */
 .reflection-content {
-    display: flex;
-    flex-direction: column;
-    gap: 100px;
+    position: relative;
     padding: 120px 0;
     color: var(--cream);
 }
 
-.next-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+.reflection-columns {
+    display: grid;
+    grid-template-columns: 1fr;
 }
 
-.next-steps-text {
-    width: 800px;
-    height: 317px;
-    font-size: 24px;
-    line-height: normal;
-}
-
-.next-steps-text ul {
-    margin-top: var(--blank-24);
-    padding-left: 42px;
-    list-style: disc;
-}
-
-.next-steps-text li + li {
-    margin-top: var(--blank-24);
-}
-
-.next-steps-text li::marker {
-    font-size: 28px;
-}
-
-.next-steps-point {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-/* The 0.18px-tall Figma divider draws its stroke above its box */
-.reflection-content > .divider {
-    margin-top: -1.82px;
-}
-
+.next-steps,
 .learned {
     display: flex;
     flex-direction: column;
     gap: 32px;
-    width: 800px;
-    margin-left: 400px;
 }
 
-.learned-text {
-    height: 143px;
+.reflection-body {
     font-size: 24px;
-    line-height: normal;
+    line-height: 1.5;
 }
 
-.learned-lead {
-    margin-bottom: var(--blank-24);
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.wrap-up {
+/* Numbered steps: a gold number, then a bold title and its description */
+.ns-steps {
     display: flex;
     flex-direction: column;
     gap: 32px;
-    padding-left: 400px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ns-step {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+}
+
+.ns-num {
+    flex-shrink: 0;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    /* A lighter tint of the gold (60% toward cream), so the numbers meet
+       4.5:1 even on the lightest part of the texture */
+    color: #ebe1c0;
+}
+
+/* Step descriptions a little softer than the bold titles */
+.ns-step .reflection-body {
+    color: rgba(255, 246, 238, 0.85);
+}
+
+.ns-title {
+    margin-bottom: 8px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* The insight as a pull quote: a 4px gold bar exactly as tall as the text
+   (trimmed to the first line's capitals and the last baseline) */
+.learned-quote {
+    margin: 0;
+    padding-left: 24px;
+    border-left: 4px solid var(--gold-underlines);
+}
+
+.learned-quote p {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--cream);
+    text-box: trim-both cap alphabetic;
+}
+
+.learned-quote + .reflection-body {
+    margin-top: -8px; /* 24px from the quote (the column gap is 32px) */
+}
+
+/* Closing: 96px below the columns, a thin divider, then centred text and the
+   two buttons */
+.wrap-up {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 96px;
+    padding-top: 64px;
+    border-top: 1px solid rgba(255, 246, 238, 0.2);
+    text-align: center;
 }
 
 .wrap-up-line {
-    height: 45px;
-    font-size: 28px;
-    line-height: normal;
+    font-size: 24px;
+    line-height: 1.4;
+    color: var(--cream);
 }
 
 .wrap-up-thanks {
-    height: 29px;
-    padding-left: 0.25em;
-    font-size: 24px;
-    font-style: italic;
-    line-height: normal;
+    margin-top: 12px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: rgba(255, 246, 238, 0.75);
+}
+
+.wrap-up-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+/* Buttons: at least 44px tall on screen, with a visible focus ring */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: calc(44 * var(--px));
+    padding: 0 calc(24 * var(--px));
+    border: calc(2 * var(--px)) solid transparent;
+    border-radius: 999px;
+    font-size: calc(16 * var(--px));
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.button--outline {
+    border-color: var(--cream);
+    color: var(--cream);
+}
+
+.button--outline:hover {
+    background-color: rgba(255, 246, 238, 0.1);
+}
+
+.button--gold {
+    border-color: var(--gold-underlines);
+    background-color: var(--gold-underlines);
+    color: var(--dark-green);
+}
+
+.button--gold:hover {
+    background-color: #d8cf92;
+}
+
+.button:focus-visible {
+    outline: calc(2 * var(--px)) solid var(--cream);
+    outline-offset: calc(3 * var(--px));
+}
+
+/* 1024px and wider: the column sits on the page's left edge, at most 760px
+   wide, with 96px before "What I Learned"; the pull quote is 36px */
+@media (min-width: 1024px) {
+    .reflection-columns {
+        max-width: 760px;
+        row-gap: 96px;
+    }
+
+    .learned-quote p {
+        font-size: 36px;
+    }
+}
+
+/* Below 1024px: one column (Next Steps, What I Learned, closing), 64px apart */
+@media (max-width: 1023px) {
+    .reflection-columns {
+        grid-template-columns: 1fr;
+        row-gap: 64px;
+    }
+
+    .wrap-up {
+        margin-top: 64px;
+    }
 }
 
 /* ---------- Motion preferences ---------- */
@@ -1492,6 +1607,13 @@ main > section {
    cover and nav to fit the window height), centered. */
 .case-study {
     zoom: var(--page-zoom, 1);
+}
+
+/* ---------- Cover logo below 1024px: 80% of the content width ---------- */
+@media (max-width: 1023px) {
+    .cover {
+        --logo-w: 80%;
+    }
 }
 
 /* ---------- Case-study bar below 1024px ----------
@@ -1943,10 +2065,6 @@ main > section {
         white-space: normal;
     }
 
-    /* The desktop line breaks are dropped so the label can balance its own lines */
-    .stat-label br {
-        display: none;
-    }
 
     /* The last two words of card text and a few paragraphs stay together, so no
        word is left alone on the last line even where text-wrap isn't supported */
@@ -2360,90 +2478,58 @@ main > section {
         aspect-ratio: 289.4 / 524.5;
     }
 
-    /* Reflection: the large rotated plant is left out so it can't cover the text */
-    .reflection {
-        height: auto;
-    }
-
-    .reflection-bg {
-        inset: 0;
-        height: auto;
-    }
-
-    .reflection-frame {
-        height: auto;
-    }
-
-    .reflection-plant {
-        display: none;
-    }
-
+    /* Reflection: phone sizes */
     .reflection-content {
-        gap: var(--space);
         padding: var(--space) 0 calc(2 * var(--space)); /* the page ends here, so twice the usual space */
     }
 
-    .next-steps {
-        gap: 16px;
-    }
-
-    .next-steps-text {
-        width: auto;
-        height: auto;
-        font-size: 17px;
-        line-height: 1.5;
-    }
-
-    .next-steps-text ul {
-        margin-top: 16px;
-        padding-left: 22px;
-    }
-
-    .next-steps-text li + li {
-        margin-top: 16px;
-    }
-
-    .next-steps-text li::marker {
-        font-size: 17px;
-    }
-
-    .next-steps-point {
-        font-size: 17px;
-        line-height: 1.35;
-    }
-
+    .next-steps,
     .learned {
+        gap: 20px;
+    }
+
+    .reflection-body {
+        font-size: 17px;
+    }
+
+    .ns-steps {
+        gap: 24px;
+    }
+
+    .ns-step {
         gap: 16px;
-        width: auto;
-        margin-left: 0;
     }
 
-    .learned-text {
-        height: auto;
-        font-size: 17px;
-        line-height: 1.5;
+    .ns-num {
+        font-size: 24px;
     }
 
-    .learned-lead {
-        margin-bottom: 12px;
-        font-size: 17px;
-        line-height: 1.35;
+    .ns-title {
+        margin-bottom: 4px;
+        font-size: 18px;
+    }
+
+    .learned-quote {
+        padding-left: 16px;
+    }
+
+    .learned-quote p {
+        font-size: 24px;
+    }
+
+    .learned-quote + .reflection-body {
+        margin-top: 4px;
     }
 
     .wrap-up {
-        gap: 12px;
-        padding-left: 0;
+        padding-top: 48px;
     }
 
     .wrap-up-line {
-        height: auto;
-        font-size: 17px;
-        line-height: 1.4;
+        font-size: 20px;
     }
 
     .wrap-up-thanks {
-        height: auto;
-        padding-left: 0;
         font-size: 16px;
     }
 }
