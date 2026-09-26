@@ -25,33 +25,54 @@
 <body>
 <div class="case-study">
 
+    <!-- ========== MAIN SITE NAV (placeholder until the portfolio has a shared nav) ========== -->
+    <header class="site-nav">
+        <div class="container site-nav-inner">
+            <a class="site-nav-name" href="../index.html">Nada Hashem</a>
+            <button class="site-nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav-links" aria-label="Menu">
+                <span></span>
+            </button>
+            <nav class="site-nav-links" id="site-nav-links" aria-label="Site">
+                <a href="../index.html">Work</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== CASE-STUDY BAR (sticky) ========== -->
+    <nav class="case-nav" aria-label="Case study sections">
+        <div class="container case-nav-inner">
+            <a class="case-nav-brand" href="#cover">nuvi</a>
+            <div class="case-nav-links">
+                <a class="nav-tab" href="#overview">Overview</a>
+                <a class="nav-tab" href="#discovery">Discovery</a>
+                <a class="nav-tab" href="#synthesis">Synthesis</a>
+                <a class="nav-tab" href="#design">Design</a>
+                <a class="nav-tab" href="#tradeoffs">Trade-offs</a>
+            </div>
+        </div>
+    </nav>
+
     <!-- ========== COVER ========== -->
-    <header class="cover">
+    <header class="cover" id="cover">
         <div class="cover-bg">
             <img class="cover-texture" src="images/texture.png" alt="">
         </div>
         <div class="cover-stage">
             <div class="cover-clip">
-                <img class="cover-plant" src="images/cover-plant.svg" alt="" width="819" height="653">
+                <div class="plant cover-plant">
+                    <div class="plant-leaves"><img src="images/cover-plant-leaves.svg" alt="" width="447" height="884"></div>
+                    <div class="plant-branch"><img src="images/cover-plant-branch.svg" alt="" width="149" height="204"></div>
+                </div>
             </div>
             <div class="container cover-text">
                 <h1 class="cover-logo"><img src="images/nuvi-logo.svg" alt="nuvi" width="575" height="343"></h1>
                 <p class="cover-title">Bringing Addiction’s<br>Hidden Impact<br>Into Focus</p>
             </div>
-            <img class="cover-phone" src="images/cover-phone.svg" alt="The Nuvi app splash screen on a phone: “nuvi, your place to grow”" width="746" height="900">
         </div>
     </header>
 
-    <!-- ========== NAV ========== -->
-    <nav class="case-nav" aria-label="Case study sections">
-        <div class="container case-nav-inner">
-            <a class="nav-tab" href="#overview">Overview</a>
-            <a class="nav-tab" href="#discovery">Discovery</a>
-            <a class="nav-tab" href="#synthesis">Synthesis</a>
-            <a class="nav-tab" href="#design">Design</a>
-            <a class="nav-tab" href="#tradeoffs">Trade-offs</a>
-        </div>
-    </nav>
 
     <main>
 

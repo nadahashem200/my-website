@@ -44,10 +44,14 @@ img {
 }
 
 .case-study {
-    /* the cover phone overhangs the 1400px frame on the right, as in Figma */
+    /* nothing on the page scrolls sideways (cover artwork runs past the right edge) */
     overflow-x: clip;
-    /* Declared here (not :root) so it picks up the --fit set on this element */
-    --nav-height: calc(95px * var(--fit, 1));
+    /* One on-screen px (the page zoom divided back out): the two bars at the
+       top keep fixed on-screen sizes. js/main.js uses the same heights to keep
+       both bars + the cover above the fold. */
+    --px: calc(1px / var(--page-zoom, 1));
+    --site-nav-height: calc(64 * var(--px));
+    --nav-height: calc(48 * var(--px)); /* the section bar that slides down on scroll */
 }
 
 .frame {
@@ -151,11 +155,26 @@ main > section {
 }
 
 /* ---------- Cover ---------- */
-/* --fit (set by js/main.js) shrinks the cover and nav so they fit the viewport height.
-   Only sizes scale: the text stays on the page margin and the graphics on the right edge. */
+/* The cover is the Figma Cover frame (1400x900) drawn as one artboard,
+   centered in the page frame (--frame-w, see js/main.js): every element is
+   placed and sized in Figma px x --u, one scale for everything, so the logo
+   and headline share the page margin with the nav and the sections below.
+   The cover is as tall as the frame or the space above the nav, whichever is
+   smaller; only empty green at the bottom is cropped. The green cover is
+   exactly the frame's width (1400 Figma px = --frame-w), centered, with the
+   page background either side on wider screens; it clips the plant at its
+   edges as the Figma frame does. When the window is wider than the frame,
+   the cover is a card: rounded, with the same gap above and below it
+   (--cover-gap: the side gap, capped at 32px on screen; set in js/main.js).
+   (Mobile sets --u from the width instead.) */
 .cover {
+    --u: 1px;
     position: relative;
-    height: calc(900px * var(--fit, 1));
+    width: 1400px;
+    margin: var(--cover-gap, 0px) auto;
+    border-radius: var(--cover-radius, 0px);
+    height: var(--cover-height, calc(900 * var(--u)));
+    overflow: hidden;
 }
 
 .cover-bg {
@@ -173,21 +192,27 @@ main > section {
     object-fit: cover;
 }
 
-/* Full-width stage: the text shares the page content column, the graphics pin to the right edge */
+/* The artboard, centered */
 .cover-stage {
-    position: relative;
-    height: calc(900px * var(--fit, 1));
+    position: absolute;
+    top: 0;
+    left: calc(50% - 700 * var(--u));
+    width: calc(1400 * var(--u));
+    height: calc(900 * var(--u));
 }
 
 .cover-text {
-    height: 100%;
+    position: absolute;
+    inset: 0;
+    width: auto;
+    margin: 0;
 }
 
-/* Clips the plant at the top and right edges; the phone sits outside this clip */
+/* Holds the plant; the cover (full-bleed, overflow hidden) clips it at the top
+   and at the window's right edge */
 .cover-clip {
     position: absolute;
     inset: 0;
-    overflow: hidden;
 }
 
 /* Plant illustration (Figma "Plant" frame): leaves rotated -61.16deg, branch rotated 49.72deg */
@@ -216,72 +241,152 @@ main > section {
     transform: rotate(49.72deg);
 }
 
-/* Figma SVG export of the "Plant" frame, pinned to the right edge */
+/* Cover plant (Figma 790:10137): at x 581, y -202 in the 1400px frame, so it
+   runs 213.624px past the frame's right edge and 202px above its top, where
+   the artboard clips it */
 .cover-plant {
-    position: absolute;
+    top: calc(-202 * var(--u));
+    right: calc(-213.624 * var(--u));
+    width: calc(1032.624 * var(--u));
+    height: calc(854.988 * var(--u));
+}
+
+.cover-plant .plant-leaves {
     top: 0;
-    right: 0;
-    width: calc(819px * var(--fit, 1));
-    height: calc(653px * var(--fit, 1));
+    left: calc(10.69 * var(--u));
+    width: calc(989.682 * var(--u));
+    height: calc(817.816 * var(--u));
+}
+
+.cover-plant .plant-leaves img {
+    width: calc(447.018 * var(--u));
+    height: calc(883.656 * var(--u));
+}
+
+.cover-plant .plant-branch {
+    top: calc(230 * var(--u));
+    left: calc(658 * var(--u));
+    width: calc(251.702 * var(--u));
+    height: calc(245.351 * var(--u));
+}
+
+.cover-plant .plant-branch img {
+    width: calc(149.066 * var(--u));
+    height: calc(203.602 * var(--u));
 }
 
 .cover-logo img {
     position: absolute;
-    top: calc(79px * var(--fit, 1));
-    left: 0;
-    width: calc(575px * var(--fit, 1));
-    height: calc(343px * var(--fit, 1));
+    top: calc(79 * var(--u));
+    left: calc(100 * var(--u));
+    width: calc(575 * var(--u));
+    height: calc(343 * var(--u));
 }
 
 .cover-title {
     position: absolute;
-    top: calc(483px * var(--fit, 1));
-    left: 0;
-    width: calc(677px * var(--fit, 1));
-    font-size: calc(70px * var(--fit, 1));
+    top: calc(483 * var(--u));
+    left: calc(100 * var(--u));
+    width: calc(677 * var(--u));
+    font-size: calc(70 * var(--u));
     font-weight: 800;
-    line-height: calc(100px * var(--fit, 1));
+    line-height: calc(100 * var(--u));
     color: var(--cream);
 }
 
-/* Phone & Shadow (Figma SVG export, 790:9924): pinned to the right edge, overlapping the nav and hero.
-   The export's last 80px are transparent, so they hang past the edge as in Figma. */
-.cover-phone {
-    position: absolute;
-    top: calc(280.6px * var(--fit, 1));
-    right: calc(-80.2px * var(--fit, 1));
-    z-index: 20;
-    width: calc(745.8px * var(--fit, 1));
-    height: calc(899.8px * var(--fit, 1));
+/* ---------- Main site nav (placeholder) ----------
+   Name on the left, site links on the right, in the page's content column.
+   Not sticky: it scrolls away. */
+.site-nav {
+    background-color: var(--background-color);
 }
 
-/* ---------- Nav (Nav Bar component) ---------- */
+.site-nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--site-nav-height);
+}
+
+.site-nav-name {
+    font-size: calc(18 * var(--px));
+    font-weight: 700;
+    color: var(--dark-green);
+    text-decoration: none;
+}
+
+.site-nav-links {
+    display: flex;
+    gap: calc(32 * var(--px));
+}
+
+.site-nav-links a {
+    font-size: calc(15 * var(--px));
+    font-weight: 600;
+    color: var(--dark-green);
+    text-decoration: none;
+}
+
+.site-nav-name:hover,
+.site-nav-links a:hover {
+    color: rgba(6, 33, 29, 0.7);
+}
+
+.site-nav-toggle {
+    display: none;
+}
+
+/* ---------- Section bar ----------
+   A slim bar fixed to the top of the window: "nuvi" on the left, the section
+   links grouped on the right, in the page's content column. It is hidden
+   above the window until the cover has scrolled out of view, then slides
+   down (js/main.js adds .is-visible), and slides away again back at the cover. */
 .case-nav {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 10;
+    right: 0;
+    left: 0;
+    z-index: 30;
     height: var(--nav-height);
     background-color: var(--background-color);
-    filter: drop-shadow(0 4px 2px rgba(0, 0, 0, 0.1));
+    box-shadow: 0 calc(2 * var(--px)) calc(8 * var(--px)) rgba(0, 0, 0, 0.08);
+    visibility: hidden;
+    transform: translateY(calc(-100% - 12 * var(--px)));
+    transition: transform 0.2s ease-out, visibility 0s linear 0.2s;
 }
 
-/* Once pinned, the nav sits above the cover phone that overlaps it at rest */
-.case-nav.is-stuck {
-    z-index: 30;
+.case-nav.is-visible {
+    visibility: visible;
+    transform: none;
+    transition: transform 0.2s ease-out, visibility 0s;
 }
 
 .case-nav-inner {
     display: flex;
     align-items: center;
-    gap: calc(40px * var(--fit, 1));
+    justify-content: space-between;
     height: 100%;
 }
 
-.nav-tab {
-    border-bottom: 1px solid transparent;
-    font-size: calc(18px * var(--fit, 1));
+.case-nav-brand {
+    font-size: calc(16 * var(--px));
     font-weight: 700;
-    line-height: calc(30.256px * var(--fit, 1));
+    color: var(--dark-green);
+    text-decoration: none;
+}
+
+.case-nav-links {
+    display: flex;
+    gap: calc(40 * var(--px));
+}
+
+/* The section in view gets a gold underline (the colour of the section-title
+   underlines, e.g. under "When someone you love...") */
+.nav-tab {
+    padding: calc(4 * var(--px)) 0;
+    border-bottom: calc(2 * var(--px)) solid transparent;
+    font-size: calc(14 * var(--px));
+    font-weight: 400;
     color: var(--dark-green);
     text-decoration: none;
     white-space: nowrap;
@@ -298,11 +403,14 @@ main > section {
 }
 
 .nav-tab.is-selected {
-    border-bottom-color: #000;
+    border-bottom-color: var(--gold-underlines);
     color: var(--dark-green);
 }
 
-.nav-tab:focus-visible {
+.nav-tab:focus-visible,
+.case-nav-brand:focus-visible,
+.site-nav a:focus-visible,
+.site-nav-toggle:focus-visible {
     outline: 2px solid var(--gold-emphasis);
     outline-offset: 4px;
 }
@@ -1360,14 +1468,17 @@ main > section {
 
     .slide.is-entering,
     .arrow img,
-    .nav-tab {
+    .nav-tab,
+    .case-nav,
+    .case-nav.is-visible {
         transition: none;
     }
 }
 
 /* ---------- Fit to the window ----------
    The Figma frame is a single 1400px desktop layout. js/main.js sets --page-zoom
-   so the shared 1200px content column always sits between equal side margins. */
+   so that frame is --frame-w wide (at most 1440px, and small enough for the
+   cover and nav to fit the window height), centered. */
 .case-study {
     zoom: var(--page-zoom, 1);
 }
@@ -1381,7 +1492,8 @@ main > section {
     .case-study {
         --m: 24px; /* side margin for every section */
         --space: 64px; /* the one spacing value between sections and major blocks */
-        --nav-height: 60px;
+        --site-nav-height: 56px;
+        --nav-height: 48px;
     }
 
     /* No widows (a lone word on the last line). Headings and short labels are
@@ -1479,7 +1591,7 @@ main > section {
     /* Cover: the logo and leaf branch keep their desktop arrangement (the vine
        starts under the "i"), scaled to span from the page margin to the right
        edge. On desktop that span is 1300 Figma px (logo left 100 to edge 1400),
-       so --k is one Figma px. The headline follows below; no phone. */
+       so --k is one Figma px. The headline follows below. */
     .cover,
     .cover-stage {
         height: auto;
@@ -1487,17 +1599,29 @@ main > section {
 
     .cover {
         --k: calc((100vw - var(--m)) / 1300);
+        --u: var(--k);
+        width: auto;
+        margin: 0;
+        border-radius: 0;
+        overflow: visible;
+    }
+
+    /* The desktop artboard is replaced by the stacked layout below */
+    .cover-stage {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: auto;
+    }
+
+    .cover-clip {
+        overflow: hidden;
     }
 
     .cover-stage {
         display: flex;
         flex-direction: column;
         padding: calc(79 * var(--k)) 0 var(--space);
-    }
-
-    .cover-plant {
-        width: calc(819 * var(--k));
-        height: auto;
     }
 
     .cover-text {
@@ -1525,33 +1649,120 @@ main > section {
         line-height: 1.3;
     }
 
-    /* No phone on mobile (its small leaf branch is part of the same artwork) */
-    .cover-phone {
-        display: none;
+    /* Main site nav: the name plus a menu icon that opens the links below it */
+    .site-nav {
+        position: relative;
+        z-index: 40;
     }
 
-    /* Nav: all five tabs on one line inside the page margins. The font fills
-       the width left after 16px gaps, from 12px up to 15px (the five labels are
-       21.54em wide in total). On narrow phones where 12px text would not fit
-       with 16px gaps, the gaps shrink (never below 8px); on wider screens the
-       tabs spread out to at most 28px apart. */
+    .site-nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin-right: -10px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+    }
+
+    /* Three-line menu icon */
+    .site-nav-toggle span,
+    .site-nav-toggle span::before,
+    .site-nav-toggle span::after {
+        display: block;
+        width: 22px;
+        height: 2px;
+        border-radius: 1px;
+        background-color: var(--dark-green);
+    }
+
+    .site-nav-toggle span {
+        position: relative;
+    }
+
+    .site-nav-toggle span::before,
+    .site-nav-toggle span::after {
+        content: "";
+        position: absolute;
+        left: 0;
+    }
+
+    .site-nav-toggle span::before {
+        top: -7px;
+    }
+
+    .site-nav-toggle span::after {
+        top: 7px;
+    }
+
+    .site-nav-links {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        padding: 8px var(--m) 16px;
+        background-color: var(--background-color);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .site-nav.is-open .site-nav-links {
+        display: flex;
+    }
+
+    .site-nav-links a {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    /* Case-study bar: "nuvi", then the section links in one row that scrolls
+       sideways (no scrollbar, no wrapping). A fade on the right edge shows
+       there are more links; js/main.js removes it once the row is scrolled to
+       the end. Each link is a 44px-tall tap target. */
     .case-nav-inner {
-        justify-content: space-between;
-        gap: 8px;
-        max-width: calc(21.54 * 15px + 4 * 28px);
+        justify-content: flex-start;
+        gap: 20px;
         margin: 0;
-        padding: 0 var(--m);
+        padding-left: var(--m);
+    }
+
+    .case-nav-brand {
+        flex-shrink: 0;
+    }
+
+    .case-nav-links {
+        flex: 1;
+        min-width: 0;
+        gap: 24px;
+        padding-right: var(--m);
         overflow-x: auto;
         scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
     }
 
-    .case-nav-inner::-webkit-scrollbar {
+    .case-nav-links.is-scrolled-end {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .case-nav-links::-webkit-scrollbar {
         display: none;
     }
 
     .nav-tab {
-        font-size: clamp(12px, calc((100vw - 2 * var(--m) - 4 * 16px) / 21.54), 15px);
-        line-height: 1.6;
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        min-height: 44px;
+        font-size: 14px;
     }
 
     /* Hero */
