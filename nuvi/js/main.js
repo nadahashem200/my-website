@@ -7,22 +7,11 @@
 const caseStudy = document.querySelector(".case-study");
 
 /* ---------- Fit the design to the window ----------
-   The whole case study is the 1400px Figma frame, shown in one centered frame
-   of width --frame-w and zoomed to fit it (every section's content column,
-   the cover text and the nav share Figma's 100px page margin inside it).
-   Section backgrounds and the cover texture are full-bleed.
-     --frame-w = min(1440px, window width,
-                     (window height - the main nav - the card's gaps above
-                       and below) x FIGMA_WIDTH / CONTENT_BOTTOM)
-   so the main site nav and the cover card (content down to CONTENT_BOTTOM,
-   with its rounded bottom corners) fit the window height. The main nav has a
-   fixed on-screen height (--site-nav-height in styles.css). */
+   The page is the 1400px Figma frame, shown in one centered frame of width
+   --frame-w = min(1440px, window width) and zoomed to fit it. --frame-w is
+   also set on the root, for the cover and main nav, which sit outside the
+   zoomed .case-study (their sizes are in styles.css). */
 const FIGMA_WIDTH = 1400;
-const FIGMA_HEIGHT = 900;
-const CONTENT_BOTTOM = 822; // the headline's bottom (782) + 40px padding
-const SITE_NAV_HEIGHT = 64; // on-screen px
-const CARD_MAX_GAP = 32; // on-screen px
-const CARD_RADIUS = 20; // on-screen px
 const MAX_FRAME_WIDTH = 1440;
 
 /* Below this width the page uses its own stacked mobile layout (see the
@@ -31,39 +20,11 @@ const MOBILE_MAX_WIDTH = 767;
 
 function updateZoom() {
     const width = document.documentElement.clientWidth;
+    const isMobile = width <= MOBILE_MAX_WIDTH;
 
-    if (width <= MOBILE_MAX_WIDTH) {
-        caseStudy.style.setProperty("--page-zoom", 1);
-        caseStudy.style.removeProperty("--cover-gap");
-        caseStudy.style.removeProperty("--cover-radius");
-        return;
-    }
-
-    // clientHeight is the stable viewport height (it ignores mobile toolbar show/hide), like 100svh
-    const height = document.documentElement.clientHeight;
-    // The frame width and the card's top gap depend on each other, so they are solved together
-    const bars = SITE_NAV_HEIGHT;
-    let zoom = 1;
-    let frameWidth = MAX_FRAME_WIDTH;
-    let topGap = 0;
-    for (let i = 0; i < 20; i++) {
-        frameWidth = Math.min(MAX_FRAME_WIDTH, width, (height - bars - 2 * topGap) * FIGMA_WIDTH / CONTENT_BOTTOM);
-        zoom = frameWidth / FIGMA_WIDTH;
-        topGap = Math.min(CARD_MAX_GAP, (width - frameWidth) / 2);
-    }
-    caseStudy.style.setProperty("--frame-w", `${frameWidth}px`);
-    caseStudy.style.setProperty("--page-zoom", zoom);
-
-    // A card when the window is wider than the frame: rounded, with the side
-    // gap (capped) above and below it. Values are in the zoomed page's px.
-    caseStudy.style.setProperty("--cover-gap", `${topGap / zoom}px`);
-    caseStudy.style.setProperty("--cover-radius", topGap > 0 ? `${CARD_RADIUS / zoom}px` : "0px");
-
-    // The cover is as tall as the Figma frame, or the space left between the
-    // main nav and the gap below the card if that is less (only empty green
-    // below CONTENT_BOTTOM is cropped)
-    const spaceForCover = (height - bars - 2 * topGap) / zoom;
-    caseStudy.style.setProperty("--cover-height", `${Math.min(FIGMA_HEIGHT, spaceForCover)}px`);
+    const frameWidth = Math.min(MAX_FRAME_WIDTH, width);
+    document.documentElement.style.setProperty("--frame-w", `${frameWidth}px`);
+    caseStudy.style.setProperty("--page-zoom", isMobile ? 1 : frameWidth / FIGMA_WIDTH);
 }
 
 updateZoom();
@@ -104,22 +65,9 @@ updateHeroLineWidth();
 window.addEventListener("resize", updateHeroLineWidth);
 document.fonts.ready.then(updateHeroLineWidth);
 
-/* ---------- Main site nav: the menu button (mobile) opens the links ---------- */
-const siteNav = document.querySelector(".site-nav");
-const siteNavToggle = siteNav.querySelector(".site-nav-toggle");
-
-siteNavToggle.addEventListener("click", () => {
-    const isOpen = siteNav.classList.toggle("is-open");
-    siteNavToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-/* ---------- Section bar: slides down once the cover is out of view ---------- */
+/* ---------- Case-study bar: section links ---------- */
 const nav = document.querySelector(".case-nav");
-const cover = document.querySelector(".cover");
 
-new IntersectionObserver(([entry]) => {
-    nav.classList.toggle("is-visible", !entry.isIntersecting && entry.boundingClientRect.bottom <= 0);
-}).observe(cover);
 const tabs = [...nav.querySelectorAll(".nav-tab")];
 const sections = [...document.querySelectorAll("main > section")];
 
@@ -130,9 +78,21 @@ function updateNavFade() {
     navRow.classList.toggle("is-scrolled-end", navRow.scrollLeft + navRow.clientWidth >= navRow.scrollWidth - 1);
 }
 
+/* Below 1024px the links are centred on one row; if they don't fit, the row
+   scrolls instead (.is-overflowing in styles.css). Measured from the links
+   themselves, not the row's scroll width, which centring would hide. */
+function updateNavFit() {
+    const links = [...navRow.children];
+    const needed = links[links.length - 1].getBoundingClientRect().right - links[0].getBoundingClientRect().left;
+    const available = navRow.parentElement.getBoundingClientRect().width;
+    navRow.classList.toggle("is-overflowing", needed > available + 0.5);
+    updateNavFade();
+}
+
 navRow.addEventListener("scroll", updateNavFade, { passive: true });
-window.addEventListener("resize", updateNavFade);
-updateNavFade();
+window.addEventListener("resize", updateNavFit);
+document.fonts.ready.then(updateNavFit);
+updateNavFit();
 
 function selectTab(name) {
     tabs.forEach((tab) => {
@@ -154,41 +114,80 @@ function selectTab(name) {
     });
 }
 
+/* ---------- Active link ----------
+   Exactly one link is active (gold underline, aria-current="true"):
+   - "Overview" from page load, including while the bar sits under the cover,
+     until Discovery's top passes just below the bar
+   - otherwise the last section whose top has passed just below the bar
+     (Reflection has no link, so Trade-offs stays active there)
+   - within ~50px of the bottom of the page, always the last link
+   - after a click, the clicked link, until the smooth scroll finishes */
+// A section counts once its top is within the scroll margin (24px) + 8px of
+// the bar, so a clicked section (which lands 24px below the bar) is active
+const ACTIVE_BUFFER = 24 + 8; // px below the bar
+const BOTTOM_SLACK = 50; // px
+const linkedSections = sections.filter((section) => section.dataset.nav);
+let clickedName = null;
+let scrollIdle = null;
+
+function currentSection() {
+    const doc = document.documentElement;
+    if (window.scrollY + window.innerHeight >= doc.scrollHeight - BOTTOM_SLACK) {
+        return tabs[tabs.length - 1].getAttribute("href").slice(1);
+    }
+    const line = nav.getBoundingClientRect().height + ACTIVE_BUFFER;
+    let current = linkedSections[0].dataset.nav;
+    linkedSections.forEach((section) => {
+        if (section.getBoundingClientRect().top <= line) {
+            current = section.dataset.nav;
+        }
+    });
+    return current;
+}
+
+function updateActive() {
+    selectTab(clickedName ?? currentSection());
+}
+
+// The clicked link stays active until scrolling stops (scrollend, or no
+// scroll events for 150ms where scrollend isn't supported)
+function releaseClick() {
+    clickedName = null;
+    updateActive();
+}
+
 tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-        selectTab(tab.getAttribute("href").slice(1));
+        clickedName = tab.getAttribute("href").slice(1);
+        selectTab(clickedName);
+        clearTimeout(scrollIdle);
+        scrollIdle = setTimeout(releaseClick, 1000); // in case the page doesn't scroll at all
     });
 });
 
-/* ---------- Scroll spy ----------
-   The current section is the one under a 1px line just below the section bar.
-   The cover and Reflection have no link, so the bar shows no selection there. */
-const inView = new Set();
-let spy = null;
-
-function watchSections() {
-    if (spy) {
-        spy.disconnect();
+let frame = 0;
+window.addEventListener("scroll", () => {
+    if (clickedName) {
+        clearTimeout(scrollIdle);
+        scrollIdle = setTimeout(releaseClick, 150);
+        return;
     }
-    inView.clear();
-    const barHeight = Math.round(nav.getBoundingClientRect().height);
-    const below = Math.max(0, window.innerHeight - barHeight - 1);
-    spy = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                inView.add(entry.target);
-            } else {
-                inView.delete(entry.target);
-            }
+    if (!frame) {
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+            updateActive();
         });
-        const current = sections.find((section) => inView.has(section));
-        selectTab(current ? current.dataset.nav : null);
-    }, { rootMargin: `-${barHeight}px 0px -${below}px 0px` });
-    sections.forEach((section) => spy.observe(section));
-}
+    }
+}, { passive: true });
 
-watchSections();
-window.addEventListener("resize", watchSections);
+window.addEventListener("scrollend", () => {
+    if (clickedName) {
+        clearTimeout(scrollIdle);
+        releaseClick();
+    }
+});
+window.addEventListener("resize", updateActive);
+updateActive();
 
 /* ---------- Final UI carousel ----------
    Figma prototype: the right arrow moves the next step in from the right and
