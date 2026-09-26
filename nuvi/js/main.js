@@ -14,9 +14,9 @@ const caseStudy = document.querySelector(".case-study");
 const FIGMA_WIDTH = 1400;
 const MAX_FRAME_WIDTH = 1440;
 
-/* Below this width the page uses its own stacked mobile layout (see the
-   "Mobile layout" section of styles.css) instead of the scaled desktop frame. */
-const MOBILE_MAX_WIDTH = 767;
+/* Up to this width (phones and tablets) the page uses its own fluid, stacked
+   layout (see "Fluid layout" in styles.css) instead of the scaled desktop frame. */
+const MOBILE_MAX_WIDTH = 1023;
 
 function updateZoom() {
     const width = document.documentElement.clientWidth;
@@ -78,14 +78,23 @@ function updateNavFade() {
     navRow.classList.toggle("is-scrolled-end", navRow.scrollLeft + navRow.clientWidth >= navRow.scrollWidth - 1);
 }
 
-/* Below 1024px the links are centred on one row; if they don't fit, the row
-   scrolls instead (.is-overflowing in styles.css). Measured from the links
-   themselves, not the row's scroll width, which centring would hide. */
+/* Below 1024px the links are centred on one row; if they don't fit, they
+   wrap onto a second row (.is-overflowing in styles.css). Measured as the
+   links' own widths plus the gaps, which doesn't change when they wrap. The
+   sections' scroll offset (--nav-height) follows the bar's real height. */
 function updateNavFit() {
     const links = [...navRow.children];
-    const needed = links[links.length - 1].getBoundingClientRect().right - links[0].getBoundingClientRect().left;
+    const gap = parseFloat(getComputedStyle(navRow).columnGap) || 0;
+    const zoom = parseFloat(getComputedStyle(caseStudy).zoom) || 1;
+    const needed = links.reduce((sum, link) => sum + link.getBoundingClientRect().width, 0) + gap * zoom * (links.length - 1);
     const available = navRow.parentElement.getBoundingClientRect().width;
-    navRow.classList.toggle("is-overflowing", needed > available + 0.5);
+    const wraps = needed > available + 0.5;
+    navRow.classList.toggle("is-overflowing", wraps);
+    if (wraps) {
+        caseStudy.style.setProperty("--nav-height", `${nav.getBoundingClientRect().height / zoom}px`);
+    } else {
+        caseStudy.style.removeProperty("--nav-height");
+    }
     updateNavFade();
 }
 

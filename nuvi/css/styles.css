@@ -363,7 +363,19 @@ main > section {
     box-sizing: border-box;
     height: var(--nav-height);
     background-color: var(--background-color);
+}
+
+/* The soft shadow is drawn by a layer 40px wider than the bar on each side,
+   so the ends of the blurred shadow (which curve away at a box's corners)
+   fall outside the window: the bar's bottom edge is straight all the way
+   across. The page clips the overflow (.case-study overflow-x: clip). */
+.case-nav::after {
+    content: "";
+    position: absolute;
+    inset: 0 calc(-40 * var(--px));
+    z-index: -1;
     box-shadow: 0 calc(4 * var(--px)) calc(16 * var(--px)) rgba(0, 0, 0, 0.08);
+    pointer-events: none;
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -1618,11 +1630,11 @@ main > section {
 
 /* ---------- Case-study bar below 1024px ----------
    No "nuvi": the five section links are centred in the bar, on one row (the
-   same bar as on desktop otherwise). If they don't fit at the smallest
-   widths, js/main.js sets .is-overflowing and the row becomes left-aligned
-   and scrolls sideways, with a fade on the right edge until it's scrolled
-   to the end. Each link is a tap area at least 44px tall and 24px wide.
-   768-1023px: 16px text, 32px apart (in the zoomed page, so in --px). */
+   same bar as on desktop otherwise). If they don't fit on the narrowest
+   phones, js/main.js sets .is-overflowing and the links wrap onto a second
+   centred row (reachable by touch, mouse and keyboard alike); the bar grows
+   to fit. Each link is a tap area at least 44px tall and 24px wide.
+   768-1023px: 16px text, 32px apart. */
 @media (max-width: 1023px) {
     .case-nav-brand {
         display: none;
@@ -1644,15 +1656,16 @@ main > section {
         display: none;
     }
 
-    .case-nav-links.is-overflowing {
-        justify-content: flex-start;
-        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
-        mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+    .case-nav:has(.is-overflowing) {
+        height: auto;
+        min-height: 72px;
     }
 
-    .case-nav-links.is-overflowing.is-scrolled-end {
-        -webkit-mask-image: none;
-        mask-image: none;
+    .case-nav-links.is-overflowing {
+        flex-wrap: wrap;
+        row-gap: 0;
+        padding: 4px 0;
+        overflow-x: visible;
     }
 
     .nav-tab {
@@ -1666,14 +1679,19 @@ main > section {
     }
 }
 
-/* ---------- Mobile layout (767px and narrower) ----------
+/* ---------- Fluid layout (1023px and narrower: phones and tablets) ----------
    js/main.js turns the page zoom off at these widths. Instead of shrinking the
    1400px desktop frame, every section stacks vertically, fixed Figma widths and
    heights are released so text can reflow, and type is set at phone sizes.
    A few !important rules override inline styles in index.html. */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
+    /* Side margin for every section (and the cover, outside .case-study):
+       24px on phones, growing smoothly through the tablet range (below) */
+    :root {
+        --m: 24px;
+    }
+
     .case-study {
-        --m: 24px; /* side margin for every section */
         --space: 64px; /* the one spacing value between sections and major blocks */
         --nav-height: 72px;
     }
@@ -1770,42 +1788,10 @@ main > section {
         width: 100%;
     }
 
-    /* Cover: the text in the 24px page margins */
+    /* Cover: the text in the page margins */
     .cover-container {
         width: auto;
-        margin: 0 24px;
-    }
-
-    /* Main nav: smaller, one row; on very narrow screens the links wrap to
-       a second row under "Nada Hashem" (the links keep 44px tap areas) */
-    .site-nav-inner {
-        flex-wrap: wrap;
-        column-gap: 20px;
-        height: auto;
-        min-height: 64px;
-    }
-
-    .site-nav-name {
-        font-size: 17px;
-    }
-
-    .site-nav-links {
-        gap: 20px;
-    }
-
-    .site-nav-links a {
-        padding: 0;
-        font-size: 16px;
-    }
-
-    /* Case-study bar: 15px links, 20px apart (see "Case-study bar below
-       1024px" for the layout) */
-    .case-nav-links {
-        gap: 20px;
-    }
-
-    .nav-tab {
-        font-size: 15px;
+        margin: 0 var(--m);
     }
 
     /* Hero */
@@ -2153,6 +2139,12 @@ main > section {
     .card-grid {
         grid-template-columns: minmax(0, 1fr);
         gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+        .card-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     .card {
@@ -2531,6 +2523,57 @@ main > section {
 
     .wrap-up-thanks {
         font-size: 16px;
+    }
+}
+
+/* ---------- Side margins through the fluid range ----------
+   Below 480px: 24px. 480-767px: 4.5% of the width (never under 24px).
+   768-1023px: 5.5%. From 1024px the desktop frame's margins take over
+   (1/14 of the frame, 7.1%), so the margin only ever grows with the width. */
+@media (min-width: 480px) and (max-width: 767px) {
+    :root {
+        --m: max(24px, 4.5vw);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+        --m: 5.5vw;
+    }
+}
+
+/* ---------- Phones (767px and narrower) ---------- */
+@media (max-width: 767px) {
+    /* Main nav: smaller, one row; on very narrow screens the links wrap to
+       a second row under "Nada Hashem" (the links keep 44px tap areas) */
+    .site-nav-inner {
+        flex-wrap: wrap;
+        column-gap: 20px;
+        height: auto;
+        min-height: 64px;
+    }
+
+    .site-nav-name {
+        font-size: 17px;
+    }
+
+    .site-nav-links {
+        gap: 20px;
+    }
+
+    .site-nav-links a {
+        padding: 0;
+        font-size: 16px;
+    }
+
+    /* Case-study bar: 15px links, 20px apart (see "Case-study bar below
+       1024px" for the layout) */
+    .case-nav-links {
+        gap: 20px;
+    }
+
+    .nav-tab {
+        font-size: 15px;
     }
 }
 
