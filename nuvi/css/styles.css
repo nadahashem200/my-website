@@ -154,44 +154,24 @@ main > section {
 }
 
 /* ---------- Cover ----------
-   Full-bleed green texture. In the page's content column (.cover-container:
-   the same left and right edges as the sections below): the main nav at the
-   top, then the "nuvi" logo and the headline, anchored at the bottom left.
-   The cover sits outside the zoomed .case-study, so these are real px and
-   width-based (vw) sizes.
+   Figma "Frame 946" (1400 x 900): a vertical gradient, #f0ecd7 to white; the
+   "nuvi" wordmark and the headline in the page's content column, on the
+   left; the illustration (Figma "Frame", 609 x 900) on the right, from the
+   cover's top edge to its bottom edge. The main nav sits at the top. The
+   cover sits outside the zoomed .case-study, so these are real px.
 
-   1024px and wider: at least min(100svh, 920px) tall, with the nav at the
-   top and the logo + headline pushed to the bottom. Below 1024px: no height
-   rule, just the content plus its padding. */
+   600px and wider: the Figma frame, scaled as one unit (below).
+   Below 600px: the nav, then the wordmark and headline at 80% of the content
+   width; no illustration. */
 .cover {
-    /* The logo width: it sets the width of the logo + headline unit */
-    --logo-w: clamp(360px, 38vw, 620px);
+    --ink: #1f3227;
+    /* The wordmark's width: it sets the width of the wordmark + headline unit */
+    --logo-w: 80%;
     position: relative;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-}
-
-@media (min-width: 1024px) {
-    .cover {
-        justify-content: space-between;
-        min-height: min(100svh, 920px);
-    }
-}
-
-.cover-bg {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-}
-
-.cover-texture {
-    position: absolute;
-    top: -2.36%;
-    left: 0;
-    width: 100%;
-    height: 104.72%;
-    object-fit: cover;
+    background: linear-gradient(#f0ecd7, #fff);
 }
 
 /* The page's content column: 1200 of the 1400 Figma px of the frame */
@@ -201,44 +181,91 @@ main > section {
     margin: 0 auto;
 }
 
-/* Above: nav bottom to the top of the "i" dot. Below: the last baseline of
-   "Into Focus" to the cover's bottom edge. */
+/* Below 600px. Above: nav bottom to the top of the "i" dot. Below: the last
+   line of "Into Focus" to the cover's bottom edge. */
 .cover-body {
     position: relative;
     padding: clamp(56px, 10vw, 160px) 0 clamp(48px, 6vw, 96px);
 }
 
-/* The logo and the headline are one unit, exactly as wide as the logo
-   (--logo-w). The headline is sized in container units of this box, so its
-   first line, "Bringing Addiction's", is always exactly as wide as the logo. */
+/* The wordmark and the headline are one unit, exactly as wide as the
+   wordmark (--logo-w). The headline is sized in container units of this box,
+   in Figma's proportions: a 481.2px wordmark, then 64px, then the headline at
+   53/65px. Each of the three lines (the <br>s) stays on one line; the first,
+   "Bringing Addiction's", is a little wider than the wordmark, as in Figma. */
 .cover-title {
     container-type: inline-size;
     width: var(--logo-w);
 }
 
-/* The logo image starts 56/575 of its width above the "i" dot; the negative
-   margin (a % of the unit's width, i.e. the logo's) removes that, so the
-   space above is measured to the dot */
-.cover-logo {
-    margin-top: calc(-100% * 56 / 575);
-}
-
 .cover-logo img {
+    display: block;
     width: 100%;
     height: auto;
 }
 
-/* Calibrated so "Bringing Addiction's" is 100% of the unit's width. Each of
-   the three lines (the <br>s) stays on one line; trimmed to its last
-   baseline. 6cqi = 0.06 x the logo width. */
 .cover-headline {
-    margin-top: 6cqi;
-    font-size: calc(10.376 * 1cqi);
+    margin-top: calc(100cqi * 64 / 481.2);
+    font-size: calc(100cqi * 53 / 481.2);
     font-weight: 800;
-    line-height: 1.2;
-    color: var(--cream);
+    line-height: calc(65 / 53);
+    color: var(--ink);
     white-space: nowrap;
-    text-box: trim-end cap alphabetic;
+}
+
+.cover-illustration {
+    display: none;
+}
+
+/* 600px and wider: the Figma frame, scaled as one unit. --cs is one Figma
+   px: the content column's share of the Figma column (1200px), or less if
+   the window is too short for the 900px cover. The cover is 900 Figma px
+   tall; the nav lies over its top. The wordmark's top (the "i" dot) is 333px
+   down; the illustration runs from the top edge to the bottom edge, its
+   right edge on the content column's right edge (x 691 + 609 = 1300). */
+@media (min-width: 600px) {
+    .cover {
+        --col: calc(var(--frame-w, min(1440px, 100vw)) - 2 * var(--m));
+        --cs: min(calc(var(--col) / 1200), calc(min(100svh, 920px) / 900));
+        --logo-w: calc(481.2 * var(--cs));
+        height: calc(900 * var(--cs));
+    }
+
+    .cover .site-nav {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+    }
+
+    .cover-body {
+        padding: 0;
+    }
+
+    .cover-text {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .cover-title {
+        flex: none;
+        padding-top: calc(333 * var(--cs));
+    }
+
+    .cover-illustration {
+        display: block;
+        flex: none;
+        width: calc(609 * var(--cs));
+        max-width: none;
+        height: calc(900 * var(--cs));
+    }
+}
+
+@media (min-width: 1024px) {
+    .cover {
+        --col: calc(var(--frame-w, min(1440px, 100vw)) * 1200 / 1400);
+    }
 }
 
 /* Plant illustration (Figma "Plant" frame): leaves rotated -61.16deg, branch rotated 49.72deg */
@@ -290,7 +317,7 @@ main > section {
 }
 
 /* ---------- Main site nav (placeholder) ----------
-   At the top of the cover: transparent, cream text (the headline's cream),
+   At the top of the cover: transparent, dark text (the headline's color),
    semi-bold, in the page's content column ("Nada Hashem" on the logo's left
    edge). It scrolls away with the cover. Every link is at least 44x44px
    (padding). One row, no menu button, at every size. Real px: the cover
@@ -314,7 +341,7 @@ main > section {
     align-items: center;
     min-height: 44px;
     font-weight: 600;
-    color: var(--cream);
+    color: var(--ink);
     text-decoration: none;
     text-decoration-thickness: 2px;
     text-decoration-color: var(--gold-underlines);
@@ -346,7 +373,7 @@ main > section {
 }
 
 .site-nav a:focus-visible {
-    outline: 2px solid var(--cream);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
 }
 
@@ -1619,13 +1646,6 @@ main > section {
    cover and nav to fit the window height), centered. */
 .case-study {
     zoom: var(--page-zoom, 1);
-}
-
-/* ---------- Cover logo below 1024px: 80% of the content width ---------- */
-@media (max-width: 1023px) {
-    .cover {
-        --logo-w: 80%;
-    }
 }
 
 /* ---------- Case-study bar below 1024px ----------
