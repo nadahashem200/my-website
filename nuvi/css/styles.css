@@ -1368,33 +1368,11 @@ main > section {
 }
 
 /* ---------- Reflection ---------- */
+/* Figma "Reflection": a flat #1c3324 fill, no texture */
 .reflection {
     position: relative;
     overflow: hidden;
-}
-
-.reflection-bg {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-}
-
-/* A 15% layer of the texture's darkest green (#0b311e) over it, so it's more
-   even behind the text; the texture still shows through */
-.reflection-bg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: rgba(11, 49, 30, 0.15);
-}
-
-.reflection-texture {
-    position: absolute;
-    top: -2.36%;
-    left: 0;
-    width: 100%;
-    height: 104.72%;
-    object-fit: cover;
+    background-color: var(--dark-background);
 }
 
 .reflection-frame {
