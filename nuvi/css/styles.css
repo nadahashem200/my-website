@@ -188,14 +188,27 @@ main > section {
     padding: clamp(56px, 10vw, 160px) 0 clamp(48px, 6vw, 96px);
 }
 
-/* The wordmark and the headline are one unit, exactly as wide as the
-   wordmark (--logo-w). The headline is sized in container units of this box,
-   in Figma's proportions: a 481.2px wordmark, then 64px, then the headline at
-   53/65px. Each of the three lines (the <br>s) stays on one line; the first,
-   "Bringing Addiction's", is a little wider than the wordmark, as in Figma. */
+/* The eyebrow, the wordmark and the headline are one unit, exactly as wide as
+   the wordmark (--logo-w). Everything is sized in container units of this
+   box, in Figma px of a 481.2px wordmark: the "UX CASE STUDY" eyebrow (20px,
+   44px above the wordmark; not in Figma yet), the wordmark, then 64px, then
+   the headline at 59/72px. Each of the three headline lines (the <br>s) stays
+   on one line; the first, "Bringing Addiction's", is a little wider than the
+   wordmark. The eyebrow and the headline are #1f3227 at 80% opacity. */
 .cover-title {
     container-type: inline-size;
     width: var(--logo-w);
+}
+
+.cover-eyebrow {
+    margin-bottom: calc(100cqi * 44 / 481.2);
+    font-size: max(12px, 100cqi * 20 / 481.2); /* never below 12px, to stay legible */
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.8;
 }
 
 .cover-logo img {
@@ -206,11 +219,12 @@ main > section {
 
 .cover-headline {
     margin-top: calc(100cqi * 64 / 481.2);
-    font-size: calc(100cqi * 53 / 481.2);
-    font-weight: 800;
-    line-height: calc(65 / 53);
+    font-size: calc(100cqi * 59 / 481.2);
+    font-weight: 600;
+    line-height: calc(65 / 53); /* Figma's 65/53px ratio: 72px at 59px */
     color: var(--ink);
     white-space: nowrap;
+    opacity: 0.8;
 }
 
 .cover-illustration {
@@ -220,8 +234,8 @@ main > section {
 /* 600px and wider: the Figma frame, scaled as one unit. --cs is one Figma
    px: the content column's share of the Figma column (1200px), or less if
    the window is too short for the 900px cover. The cover is 900 Figma px
-   tall; the nav lies over its top. The wordmark's top (the "i" dot) is 333px
-   down; the illustration runs from the top edge to the bottom edge, its
+   tall; the nav lies over its top. The wordmark's top (the "i" dot) stays
+   333px down (the eyebrow's 20px line + 44px sit in that space); the illustration runs from the top edge to the bottom edge, its
    right edge on the content column's right edge (x 691 + 609 = 1300). */
 @media (min-width: 600px) {
     .cover {
@@ -250,7 +264,7 @@ main > section {
 
     .cover-title {
         flex: none;
-        padding-top: calc(333 * var(--cs));
+        padding-top: calc((333 - 20 - 44) * var(--cs));
     }
 
     .cover-illustration {
