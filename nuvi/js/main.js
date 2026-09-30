@@ -71,30 +71,23 @@ const nav = document.querySelector(".case-nav");
 const tabs = [...nav.querySelectorAll(".nav-tab")];
 const sections = [...document.querySelectorAll("main > section")];
 
-/* Mobile: the right-edge fade (styles.css) goes once the row is scrolled to the end */
+/* Phones: the right-edge fade (styles.css) goes once the row is scrolled to the end */
 const navRow = nav.querySelector(".case-nav-links");
 
 function updateNavFade() {
     navRow.classList.toggle("is-scrolled-end", navRow.scrollLeft + navRow.clientWidth >= navRow.scrollWidth - 1);
 }
 
-/* Below 1024px the links are centred on one row; if they don't fit, they
-   wrap onto a second row (.is-overflowing in styles.css). Measured as the
-   links' own widths plus the gaps, which doesn't change when they wrap. The
-   sections' scroll offset (--nav-height) follows the bar's real height. */
+/* Below 1024px the links are centred on one row; if they don't fit, the row
+   scrolls sideways instead (.is-overflowing in styles.css). Measured as the
+   links' own widths plus the gaps against the content column. */
 function updateNavFit() {
     const links = [...navRow.children];
     const gap = parseFloat(getComputedStyle(navRow).columnGap) || 0;
     const zoom = parseFloat(getComputedStyle(caseStudy).zoom) || 1;
     const needed = links.reduce((sum, link) => sum + link.getBoundingClientRect().width, 0) + gap * zoom * (links.length - 1);
     const available = navRow.parentElement.getBoundingClientRect().width;
-    const wraps = needed > available + 0.5;
-    navRow.classList.toggle("is-overflowing", wraps);
-    if (wraps) {
-        caseStudy.style.setProperty("--nav-height", `${nav.getBoundingClientRect().height / zoom}px`);
-    } else {
-        caseStudy.style.removeProperty("--nav-height");
-    }
+    navRow.classList.toggle("is-overflowing", needed > available + 0.5);
     updateNavFade();
 }
 
@@ -112,12 +105,18 @@ function selectTab(name) {
         } else {
             tab.removeAttribute("aria-current");
         }
-        // Keep the current link visible in the scrolling row on mobile (only
-        // the row scrolls, never the page)
+        // Keep the current link fully in view in the scrolling row on phones,
+        // clear of the end padding and the fade (only the row scrolls, never
+        // the page)
         if (isSelected && navRow.scrollWidth > navRow.clientWidth) {
+            const pad = parseFloat(getComputedStyle(navRow).paddingLeft) || 0;
             const left = tab.offsetLeft - navRow.offsetLeft;
-            if (left < navRow.scrollLeft || left + tab.offsetWidth > navRow.scrollLeft + navRow.clientWidth) {
-                navRow.scrollTo({ left: left - 24, behavior: "smooth" });
+            const right = left + tab.offsetWidth;
+            if (left - pad < navRow.scrollLeft) {
+                navRow.scrollTo({ left: left - pad, behavior: "smooth" });
+            } else if (right + pad + 48 > navRow.scrollLeft + navRow.clientWidth) {
+                // 48px: the width of the fade
+                navRow.scrollTo({ left: right + pad + 48 - navRow.clientWidth, behavior: "smooth" });
             }
         }
     });

@@ -1643,9 +1643,11 @@ main > section {
 /* ---------- Case-study bar below 1024px ----------
    No "nuvi": the five section links are centred in the bar, on one row (the
    same bar as on desktop otherwise). If they don't fit on the narrowest
-   phones, js/main.js sets .is-overflowing and the links wrap onto a second
-   centred row (reachable by touch, mouse and keyboard alike); the bar grows
-   to fit. Each link is a tap area at least 44px tall and 24px wide.
+   phones, js/main.js sets .is-overflowing and the row scrolls sideways
+   instead: one line, from the window's left edge to its right, with the page
+   margin as padding at both ends, no visible scrollbar, and a fade at the
+   right edge until it's scrolled to the end. The active link's underline
+   scrolls with it. Each link is a tap area at least 44px tall and 24px wide.
    768-1023px: 16px text, 32px apart. */
 @media (max-width: 1023px) {
     .case-nav-brand {
@@ -1668,16 +1670,21 @@ main > section {
         display: none;
     }
 
-    .case-nav:has(.is-overflowing) {
-        height: auto;
-        min-height: 72px;
+    .case-nav-links.is-overflowing {
+        box-sizing: border-box;
+        flex: none;
+        justify-content: flex-start;
+        width: calc(100% + 2 * var(--m));
+        max-width: none;
+        margin: 0 calc(-1 * var(--m));
+        padding: 0 var(--m);
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
     }
 
-    .case-nav-links.is-overflowing {
-        flex-wrap: wrap;
-        row-gap: 0;
-        padding: 4px 0;
-        overflow-x: visible;
+    .case-nav-links.is-overflowing.is-scrolled-end {
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 
     .nav-tab {
